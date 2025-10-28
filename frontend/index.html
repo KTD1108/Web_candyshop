@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CandyShop - By Gemini</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="toast-container" class="toast-container"></div>
+
+<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">CandyShop</a>
+    <form class="d-flex" role="search" onsubmit="event.preventDefault(); loadProducts()">
+      <input id="kw" class="form-control me-2" type="search" placeholder="Tìm kiếm kẹo ngon...">
+      <button class="btn btn-primary">Tìm</button>
+    </form>
+    <div id="nav-auth" class="ms-auto d-flex align-items-center">
+      <!-- Auth state will be rendered here by JavaScript -->
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    <section class="hero-section">
+        <h1>Ngọt ngào trong từng khoảnh khắc</h1>
+        <p>Khám phá thế giới bánh kẹo handmade đầy màu sắc</p>
+        <a href="#products-section" class="btn btn-primary btn-lg">Mua ngay</a>
+    </section>
+
+    <section id="categories-section" class="py-5 text-center">
+        <div class="container">
+            <h2 class="section-title mb-4">Danh mục sản phẩm</h2>
+            <div id="categories-grid" class="d-flex flex-wrap justify-content-center gap-3">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="featured-products" class="py-5 bg-light">
+        <h2 class="text-center mb-5 section-title">Sản phẩm nổi bật</h2>
+        <div id="featured-grid" class="row g-4">
+            <!-- Featured products will be loaded here -->
+        </div>
+    </section>
+
+    <section id="products-section" class="py-5 bg-white">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title">Tất cả sản phẩm</h2>
+            <div id="grid" class="row g-4">
+                <!-- All products will be loaded here -->
+            </div>
+        </div>
+    </section>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5>CandyShop</h5>
+                <p>Mang đến những sản phẩm chất lượng, được làm thủ công với tất cả tình yêu và sự tỉ mỉ.</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>Liên kết nhanh</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">Trang chủ</a></li>
+                    <li><a href="#">Sản phẩm</a></li>
+                    <li><a href="#">Về chúng tôi</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>Liên hệ</h5>
+                <p>Email: support@candyshop.local<br>Phone: 1900 1234</p>
+            </div>
+        </div>
+        <div class="text-center pt-4 border-top">
+            <p>&copy; 2025 CandyShop. All Rights Reserved. Designed by Gemini.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+let currentCategoryId = null;
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        toast.addEventListener('transitionend', () => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
+    }, 3000);
+}
+
+async function loadProducts(page=0){
+  const kw = document.getElementById('kw').value || '';
+  let url = `http://localhost:8080/api/products?kw=${encodeURIComponent(kw)}&page=${page}&size=16`;
+  if (currentCategoryId) {
+      url += `&categoryId=${currentCategoryId}`;
+  }
+
+  const res = await fetch(url);
+  const data = await res.json();
+  
+  const featuredGrid = document.getElementById('featured-grid');
+  const mainGrid = document.getElementById('grid');
+  
+  // Clear grids before rendering
+  if (page === 0) { // Only clear featured grid on first page load
+    featuredGrid.innerHTML = '';
+  }
+  mainGrid.innerHTML = '';
+
+  const products = data.content;
+
+  // Render featured products only when no filter is active
+  if (page === 0 && !currentCategoryId && !kw) {
+      products.slice(0, 8).forEach(p => {
+        featuredGrid.innerHTML += renderProductCard(p);
+      });
+      document.getElementById('featured-products').style.display = 'block';
+  } else {
+      document.getElementById('featured-products').style.display = 'none';
+  }
+
+  // Render all products for the current view
+  products.forEach(p=>{
+    mainGrid.innerHTML += renderProductCard(p);
+  });
+}
+
+
+
+async function loadCategories() {
+    const grid = document.getElementById('categories-grid');
+    try {
+        const res = await fetch('http://localhost:8080/api/categories');
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        const categories = await res.json();
+        
+        if (!categories || categories.length === 0) {
+            grid.innerHTML = '<p class="text-muted">No categories found.</p>';
+            return;
+        }
+
+        grid.innerHTML = '<a href="#" class="category-item active" onclick="filterByCategory(event, null, this)">All</a>';
+        categories.forEach(cat => {
+            grid.innerHTML += `<a href="#" class="category-item" onclick="filterByCategory(event, ${cat.id}, this)">${cat.name}</a>`;
+        });
+    } catch (e) {
+        console.error("Could not load categories", e);
+        grid.innerHTML = `<div class="alert alert-danger"><strong>Error loading categories:</strong><br>${e.message}</div>`;
+    }
+}
+
+function filterByCategory(event, categoryId, element) {
+    event.preventDefault();
+    currentCategoryId = categoryId;
+    
+    // Update active state
+    document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+
+    loadProducts(); // Reload products with the new category filter
+}
+
+function renderProductCard(p) {
+    return `
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="product-card-v2">
+          <a href="product-detail.html?id=${p.id}">
+            <div class="product-img-container">
+              <img src="${p.thumbnailUrl|| 'https://via.placeholder.com/400'}" class="card-img-top" alt="${p.name}">
+            </div>
+          </a>
+          <div class="card-body">
+            <h6 class="card-title"><a href="product-detail.html?id=${p.id}" class="text-decoration-none text-dark">${p.name}</a></h6>
+            <p class="card-text">${Number(p.price).toLocaleString()} đ</p>
+            <button class="btn btn-primary btn-sm mt-auto" onclick="addToCart(${p.id})">Thêm vào giỏ</button>
+          </div>
+        </div>
+      </div>`;
+}
+
+async function addToCart(productId){
+  const token = localStorage.getItem('accessToken');
+  if(!token){ 
+    showToast('Hãy đăng nhập trước khi mua sắm!', 'error');
+    setTimeout(() => { window.location = 'login.html'; }, 1500);
+    return; 
+  }
+  const res = await fetch('http://localhost:8080/api/cart/items', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({productId, quantity:1})
+  });
+
+  if(res.ok) {
+    showToast('Đã thêm sản phẩm vào giỏ!');
+    updateNavbar();
+  } else {
+    showToast('Lỗi khi thêm vào giỏ.', 'error');
+  }
+}
+
+function logout() {
+    localStorage.removeItem('accessToken');
+    window.location.reload();
+}
+
+async function updateNavbar() {
+    const token = localStorage.getItem('accessToken');
+    const navAuthContainer = document.getElementById('nav-auth');
+
+    let cartItemCount = 0;
+    if (token) {
+        try {
+            const res = await fetch('http://localhost:8080/api/cart', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const cart = await res.json();
+                cartItemCount = cart.cartItems.length;
+            }
+        } catch (e) { console.error(e); }
+    }
+    
+    if (token) {
+        navAuthContainer.innerHTML = `
+            <a class="btn btn-outline-primary btn-sm me-2" href="cart.html">
+                Giỏ hàng <span class="badge bg-danger ms-1">${cartItemCount}</span>
+            </a>
+            <a class="btn btn-info btn-sm me-2" href="orders.html">Đơn hàng</a>
+            <a class="btn btn-warning btn-sm me-2" href="admin-products.html" id="admin-products-link" style="display:none;">Quản lý sản phẩm</a>
+            <a class="btn btn-success btn-sm me-2" href="admin-customers.html" id="admin-customers-link" style="display:none;">Quản lý khách hàng</a>
+            <a class="btn btn-danger btn-sm me-2" href="admin-orders.html" id="admin-orders-link" style="display:none;">Quản lý đơn hàng</a>
+            <button class="btn btn-outline-secondary btn-sm" onclick="logout()">Đăng xuất</button>
+        `;
+    } else {
+        navAuthContainer.innerHTML = `
+            <a class="btn btn-outline-primary btn-sm me-2" href="cart.html">
+                Giỏ hàng <span class="badge bg-danger ms-1">0</span>
+            </a>
+            <a class="btn btn-outline-secondary btn-sm" href="login.html">Đăng nhập</a>
+        `;
+    }
+
+    // Check admin status and display admin links
+    const adminProductsLink = document.getElementById('admin-products-link');
+    const adminCustomersLink = document.getElementById('admin-customers-link');
+    const adminOrdersLink = document.getElementById('admin-orders-link');
+    if (token) {
+        const isAdmin = await checkAdminStatus();
+        if (isAdmin) {
+            if (adminProductsLink) adminProductsLink.style.display = 'block';
+            if (adminCustomersLink) adminCustomersLink.style.display = 'block';
+            if (adminOrdersLink) adminOrdersLink.style.display = 'block';
+        } else {
+            if (adminProductsLink) adminProductsLink.style.display = 'none';
+            if (adminCustomersLink) adminCustomersLink.style.display = 'none';
+            if (adminOrdersLink) adminOrdersLink.style.display = 'none';
+        }
+    }
+}
+
+async function checkAdminStatus() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        return false;
+    }
+    try {
+        const res = await fetch(`http://localhost:8080/api/auth/validate`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) {
+            throw new Error('Failed to validate token');
+        }
+        const data = await res.json();
+        return data.isAdmin;
+    } catch (error) {
+        console.error('Error validating token:', error);
+        return false;
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+    loadCategories();
+    updateNavbar();
+});
+</script>
+</body>
+</html>
