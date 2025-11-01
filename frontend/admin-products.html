@@ -101,7 +101,7 @@
             <label for="productImageUrl" class="form-label">URL ảnh</label>
             <input type="text" class="form-control" id="productImageUrl">
           </div>
-          <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+          <button type="button" class="btn btn-primary" id="saveProductBtn">Lưu sản phẩm</button>
         </form>
       </div>
     </div>
@@ -122,6 +122,8 @@
   const productImageUrlInput = document.getElementById('productImageUrl');
   const addProductBtn = document.getElementById('addProductBtn');
   const logoutBtn = document.getElementById('logout-btn');
+  const saveProductBtn = document.getElementById('saveProductBtn');
+
 
   function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
@@ -258,7 +260,7 @@
     fetchCategories(); // Load categories when adding a new product
   });
 
-  productForm.addEventListener('submit', async (e) => {
+  saveProductBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('accessToken');
     if (!token) return;

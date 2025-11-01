@@ -259,7 +259,43 @@
         viewOrderDetails(orderId);
       });
     });
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const orderId = e.target.dataset.id;
+        deleteOrder(orderId);
+      });
+    });
   }
+
+  saveOrderStatusBtn.addEventListener('click', async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token || !currentOrderId) return;
+
+    const newStatus = orderStatusSelect.value;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/orders/${currentOrderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update order status');
+      }
+
+      showToast('Trạng thái đơn hàng đã được cập nhật thành công!');
+      orderModal.hide();
+      fetchOrders(); // Refresh the list
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      showToast('Lỗi khi cập nhật trạng thái.', 'error');
+    }
+  });
 
   async function deleteOrder(orderId) {
     if (!confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?')) {
