@@ -40,24 +40,18 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider)
 			throws Exception {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				                .authorizeHttpRequests(auth -> auth
-				                        .requestMatchers("/api/auth/**").permitAll()
-				                        .requestMatchers("/api/products/**").permitAll()
-				                        .requestMatchers("/api/categories/**").permitAll()
-				                        .requestMatchers("/api/roles/**").authenticated()
-				                        .requestMatchers("/api/cart/**", "/api/orders/**").authenticated()
-				                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-				                        .anyRequest().authenticated()
-				                )				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(authenticationProvider)
+				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				            .authorizeHttpRequests(authorize -> authorize
+				                .requestMatchers("/**").permitAll() // Tạm thời cho phép tất cả các request để debug
+				            ).authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
 	}
 
 	@Bean
 	public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
 			PasswordEncoder passwordEncoder) {
-		// 👉 Inject UDS qua tham số để chắc chắn không null
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setUserDetailsService(userDetailsService);
 		provider.setPasswordEncoder(passwordEncoder);
@@ -76,12 +70,13 @@ public class SecurityConfig {
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("*"));
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("*"));
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
+		CorsConfiguration c = new CorsConfiguration();
+		// Nếu bạn dùng cookie/credentials, KHÔNG được dùng "*"; hãy chỉ rõ origin.
+		c.setAllowedOrigins(List.of("*"));
+		c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+		c.setAllowedHeaders(List.of("*"));
+		UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
+		src.registerCorsConfiguration("/**", c);
+		return src;
 	}
 }

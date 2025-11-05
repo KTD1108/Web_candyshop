@@ -1,0 +1,255 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap');
+
+/* General Styles */
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #FCFBF8; /* A very light, warm off-white */
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #eee;
+}
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #d58c8a !important; /* A soft pink/coral color */
+}
+
+/* Buttons */
+.btn {
+    border-radius: 20px;
+    padding: 8px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-primary {
+    background-color: #d58c8a;
+    border-color: #d58c8a;
+}
+.btn-primary:hover {
+    background-color: #c97b79;
+    border-color: #c97b79;
+    transform: translateY(-2px);
+}
+.btn-outline-primary {
+    border-color: #d58c8a;
+    color: #d58c8a;
+}
+.btn-outline-primary:hover {
+    background-color: #d58c8a;
+    color: white;
+}
+.btn-info {
+    background-color: #88c0d0;
+    border-color: #88c0d0;
+}
+.btn-info:hover {
+    background-color: #79a9b8;
+    border-color: #79a9b8;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    color: white;
+    padding: 120px 0;
+    text-align: center;
+    border-radius: 20px;
+    margin-top: 2rem;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+.hero-section p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Section Title */
+.section-title {
+    font-weight: 700;
+    color: #333;
+}
+
+/* Category Section */
+.category-item {
+    display: block;
+    padding: 10px 25px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.category-item:hover, .category-item.active {
+    background-color: #d58c8a;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(231, 60, 126, 0.4);
+}
+
+/* Product Card v2 */
+.product-card-v2 {
+    background-color: #fff;
+    border: none;
+    border-radius: 15px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    text-align: center;
+    height: 100%;
+    position: relative; /* Add for badge positioning */
+}
+
+.new-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ffc107; /* A vibrant yellow */
+    color: #333;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 10px;
+    z-index: 1;
+}
+.product-card-v2:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.product-card-v2 .product-img-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+}
+.product-card-v2 .card-img-top {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.product-card-v2:hover .card-img-top {
+    transform: scale(1.08);
+}
+.product-card-v2 .card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.product-card-v2 .card-title a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+.product-card-v2 .card-title a:hover {
+    color: #d58c8a;
+}
+.product-card-v2 .card-text {
+    font-size: 1.2rem;
+    color: #d58c8a;
+    font-weight: 700;
+    margin-bottom: 1rem; /* Add some space before the button */
+}
+
+/* Footer */
+.footer {
+    background-color: #fff;
+    padding: 50px 0;
+    margin-top: 5rem;
+    border-top: 1px solid #eee;
+}
+.footer h5 {
+    font-weight: 700;
+    color: #d58c8a;
+}
+.footer a {
+    text-decoration: none;
+    color: #555;
+    transition: color 0.3s;
+}
+.footer a:hover {
+    color: #d58c8a;
+}
+
+/* Form controls */
+.form-control {
+    border-radius: 10px;
+}
+.card.shadow-sm {
+    border-radius: 15px;
+    border: none;
+}
+
+/* Accordion (for orders) */
+.accordion-item {
+    border-radius: 15px !important;
+    border: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+.accordion-button {
+    border-radius: 15px !important;
+    font-weight: 600;
+}
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #d58c8a;
+    box-shadow: none;
+}
+
+/* Toast Notification System */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1055;
+}
+.toast-notification {
+    background-color: #fff;
+    color: #333;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-left: 5px solid #d58c8a;
+}
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+.toast-notification.success {
+    border-left-color: #28a745;
+}
+.toast-notification.error {
+    border-left-color: #dc3545;
+}

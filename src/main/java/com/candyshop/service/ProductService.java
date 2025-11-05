@@ -53,6 +53,7 @@ public class ProductService {
 		product.setDescription(productRequest.getDescription());
 		product.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
 		product.setThumbnailUrl(productRequest.getImageUrl());
+		product.setStockQty(productRequest.getStockQty() != null ? productRequest.getStockQty() : 0); // Set stock quantity, default to 0
 
 		// Generate and set slug
 		String baseSlug = generateSlug(productRequest.getName());
@@ -79,6 +80,9 @@ public class ProductService {
 		existingProduct.setDescription(productRequest.getDescription());
 		existingProduct.setPrice(BigDecimal.valueOf(productRequest.getPrice()));
 		existingProduct.setThumbnailUrl(productRequest.getImageUrl());
+		if (productRequest.getStockQty() != null) {
+			existingProduct.setStockQty(productRequest.getStockQty());
+		}
 
 		Category category = categoryRepository.findById(productRequest.getCategoryId())
 				.orElseThrow(() -> new RuntimeException("Category not found"));

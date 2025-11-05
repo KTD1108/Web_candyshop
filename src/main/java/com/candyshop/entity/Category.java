@@ -13,26 +13,28 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "categories")
-@Getter @Setter
+@Getter
+@Setter
 public class Category {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String name;
+	@Column(nullable = false)
+	private String name;
 
-    @Column(nullable = false, unique = true)
-    private String slug;
+	@Column(nullable = false, unique = true)
+	private String slug;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Category parent;
+	@ManyToOne
+	@JoinColumn(name = "parent_id")
+	private Category parent;
 
-    public Category(String name, String slug) {
-        this.name = name;
-        this.slug = slug;
-    }
+	public Category(String name, String slug) {
+		this.name = name;
+		this.slug = slug;
+	}
 
-    protected Category() {
-    }
+	public Category() {
+	}
 }
