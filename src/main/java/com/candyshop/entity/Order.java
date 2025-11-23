@@ -40,5 +40,18 @@ public class Order {
 
     private String status; // PENDING/PAID/CANCELLED
     private String shippingAddress;
+    private String shippingPhone;
+    private String paymentMethod;
+    private String shippingMethod;
+
+    @Column(columnDefinition = "TEXT")
+    private String orderNotes;
+
+    private String voucherCode;
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal shippingFee;
+
     private Instant createdAt = Instant.now();
 }

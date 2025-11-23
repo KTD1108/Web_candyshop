@@ -18,6 +18,10 @@ import com.candyshop.repository.CartRepository;
 import com.candyshop.repository.OrderItemRepository;
 import com.candyshop.repository.OrderRepository;
 
+import com.candyshop.entity.Voucher;
+import com.candyshop.repository.VoucherRepository;
+import com.candyshop.service.VoucherService;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +31,8 @@ public class OrderService {
 	private final CartItemRepository cartItemRepo;
 	private final OrderRepository orderRepo;
 	private final OrderItemRepository orderItemRepo;
+	private final VoucherService voucherService;
+	private final VoucherRepository voucherRepository;
 
 	@Transactional
 	public Order checkout(User user, CheckoutRequest dto) {
@@ -36,18 +42,51 @@ public class OrderService {
 			throw new RuntimeException("Giỏ hàng trống, không thể đặt hàng");
 		}
 
-		BigDecimal total = items.stream()
+		BigDecimal subtotal = items.stream()
 				.map(ci -> ci.getProduct().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())))
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		String shippingAddress = String.format("%s, %s, %s", dto.getCustomerName(), dto.getCustomerPhone(),
-				dto.getAddress());
+		BigDecimal shippingFee = "EXPRESS".equalsIgnoreCase(dto.getShippingMethod())
+				? new BigDecimal("40000")
+				: new BigDecimal("20000");
+
+		BigDecimal discountAmount = BigDecimal.ZERO;
+		Voucher voucher = null;
+		if (dto.getVoucherCode() != null && !dto.getVoucherCode().isBlank()) {
+			voucher = voucherService.findByCode(dto.getVoucherCode());
+			discountAmount = voucherService.calculateDiscount(voucher, subtotal);
+		}
+
+		BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
+		if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+			totalAmount = BigDecimal.ZERO;
+		}
 
 		Order order = new Order();
 		order.setUser(user);
-		order.setTotalAmount(total);
+		order.setTotalAmount(totalAmount);
+		order.setShippingFee(shippingFee);
+		order.setShippingMethod(dto.getShippingMethod());
+		order.setPaymentMethod(dto.getPaymentMethod());
+		order.setOrderNotes(dto.getOrderNotes());
 		order.setStatus("PENDING");
-		order.setShippingAddress(shippingAddress);
+		order.setDiscountAmount(discountAmount);
+		order.setVoucherCode(dto.getVoucherCode());
+
+		if (dto.isUseProfileAddress()) {
+			if (user.getAddress() == null || user.getAddress().isBlank() || user.getPhone() == null || user.getPhone().isBlank()) {
+				throw new RuntimeException("Vui lòng cập nhật địa chỉ và số điện thoại trong hồ sơ của bạn trước.");
+			}
+			order.setShippingAddress(user.getAddress());
+			order.setShippingPhone(user.getPhone());
+		} else {
+			if (dto.getAddress() == null || dto.getAddress().isBlank() || dto.getCustomerPhone() == null || dto.getCustomerPhone().isBlank()) {
+				throw new RuntimeException("Vui lòng cung cấp địa chỉ và số điện thoại giao hàng.");
+			}
+			order.setShippingAddress(dto.getAddress());
+			order.setShippingPhone(dto.getCustomerPhone());
+		}
+
 		order = orderRepo.save(order);
 
 		for (CartItem ci : items) {
@@ -57,6 +96,11 @@ public class OrderService {
 			oi.setPrice(ci.getProduct().getPrice());
 			oi.setQuantity(ci.getQuantity());
 			orderItemRepo.save(oi);
+		}
+
+		if (voucher != null) {
+			voucher.setCurrentUsage(voucher.getCurrentUsage() + 1);
+			voucherRepository.save(voucher);
 		}
 
 		// Clear the cart by deleting all items

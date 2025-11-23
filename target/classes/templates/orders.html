@@ -126,9 +126,9 @@ async function loadOrders() {
               <ul class="list-unstyled">${itemsHtml}</ul>
               <hr>
               <p><strong>Thông tin giao hàng:</strong></p>
-              <p class="mb-1 ms-3">- Người nhận: ${order.shippingAddress.split(', ')[0] || ''}</p>
-              <p class="mb-1 ms-3">- Số điện thoại: ${order.shippingAddress.split(', ')[1] || ''}</p>
-              <p class="mb-1 ms-3">- Địa chỉ: ${order.shippingAddress.split(', ').slice(2).join(', ') || ''}</p>
+              <p class="mb-1 ms-3">- Người nhận: ${order.user.fullName || 'N/A'}</p>
+              <p class="mb-1 ms-3">- Số điện thoại: ${order.shippingPhone || 'N/A'}</p>
+              <p class="mb-1 ms-3">- Địa chỉ: ${order.shippingAddress || 'N/A'}</p>
             </div>
           </div>
         </div>

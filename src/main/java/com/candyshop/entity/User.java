@@ -30,6 +30,8 @@ public class User {
     private String passwordHash;
 
     private String fullName;
+    private String address;
+    private String phone;
     private Boolean enabled = true;
 
     @ManyToMany(fetch = FetchType.EAGER)

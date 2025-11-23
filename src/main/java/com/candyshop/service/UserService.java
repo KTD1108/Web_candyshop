@@ -93,4 +93,28 @@ public class UserService {
 
         userRepository.delete(user);
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
+    }
+
+    @Transactional
+    public void updateProfile(String email, com.candyshop.dto.ProfileUpdateRequest request) {
+        User user = getUserByEmail(email);
+        user.setFullName(request.getFullName());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(String email, com.candyshop.dto.ChangePasswordRequest request) {
+        User user = getUserByEmail(email);
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+            throw new RuntimeException("Invalid old password");
+        }
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }
