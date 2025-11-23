@@ -46,6 +46,11 @@ public class ViewController {
         return "profile";
     }
 
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+
     @GetMapping("/contact.html")
     public String contact() {
         return "contact";

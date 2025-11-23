@@ -35,7 +35,7 @@
 
 <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/"><img src="/images/logo.jpg" alt="CandyShop Logo" style="height: 70px;"></a>
+    <a class="navbar-brand fw-bold" href="/"><img src="/images/logo.jpg" alt="Tiệm ngọt 108 Logo" style="height: 70px;"></a>
     <div id="nav-auth" class="ms-auto d-flex align-items-center">
       <!-- Auth state will be rendered here by JavaScript -->
     </div>
@@ -117,7 +117,7 @@
           <strong>Thông tin chuyển khoản:</strong><br>
           Ngân hàng: Vietcombank<br>
           Số tài khoản: 0123456789<br>
-          Chủ tài khoản: Candy Shop<br>
+          Chủ tài khoản: Tiệm ngọt 108<br>
           Nội dung: Thanh toan don hang [Mã đơn hàng sẽ được tạo sau khi đặt]
         </div>
         <hr class="my-4">
@@ -135,24 +135,24 @@
 
     <!-- Right Column: Order Summary -->
     <div class="col-md-5 col-lg-4 order-md-last">
-        <div class="sticky-top" style="top: 100px;">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-primary">Tóm tắt đơn hàng</span>
-                <span class="badge bg-primary rounded-pill" id="item-count">0</span>
-            </h4>
-            <ul class="list-group mb-3" id="cart-summary-items">
+        <div class="card sticky-top" style="top: 100px;">
+            <div class="card-header">
+                <h4 class="d-flex justify-content-between align-items-center mb-0">
+                    <span class="text-primary">Tóm tắt đơn hàng</span>
+                    <span class="badge bg-primary rounded-pill" id="item-count">0</span>
+                </h4>
+            </div>
+            <ul class="list-group list-group-flush" id="cart-summary-items">
                 <!-- Cart items will be loaded here -->
             </ul>
             
-            <div class="card mb-3">
-                <div class="card-body">
-                    <button class="btn btn-outline-secondary w-100" type="button" onclick="openVoucherModal()">
-                        Chọn hoặc nhập mã giảm giá
-                    </button>
-                </div>
+            <div class="card-body">
+                <button class="btn btn-outline-secondary w-100" type="button" onclick="openVoucherModal()">
+                    Chọn hoặc nhập mã giảm giá
+                </button>
             </div>
 
-            <ul class="list-group mb-3">
+            <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Tạm tính (VND)</span>
                     <strong id="subtotal-price">0 đ</strong>
@@ -169,8 +169,8 @@
                     <strong id="shipping-fee-price">0 đ</strong>
                 </li>
                 <li class="list-group-item d-flex justify-content-between bg-light">
-                    <h5 class="fw-bold">Tổng cộng</h5>
-                    <h5 class="fw-bold" id="total-price">0 đ</h5>
+                    <h5 class="fw-bold mb-0">Tổng cộng</h5>
+                    <h5 class="fw-bold mb-0" id="total-price">0 đ</h5>
                 </li>
             </ul>
         </div>
@@ -180,7 +180,7 @@
 
 <footer class="footer">
     <div class="container">
-        <p class="text-center text-muted">&copy; 2025 CandyShop.</p>
+        <p class="text-center text-muted">&copy; 2025 Tiệm ngọt 108.</p>
     </div>
 </footer>
 
@@ -448,7 +448,10 @@ async function updateNavbar() {
     const token = localStorage.getItem('accessToken');
     const navAuthContainer = document.getElementById('nav-auth');
     if (!token) {
-        navAuthContainer.innerHTML = `<a class="btn btn-outline-secondary btn-sm" href="/login">Đăng nhập</a>`;
+        navAuthContainer.innerHTML = `
+            <a class="btn btn-outline-secondary btn-sm me-2" href="/about">Giới thiệu</a>
+            <a class="btn btn-outline-secondary btn-sm" href="/login">Đăng nhập</a>
+        `;
         return;
     }
 
@@ -464,6 +467,7 @@ async function updateNavbar() {
         </a>
         <a class="btn btn-info btn-sm me-2" href="/orders.html">Đơn hàng</a>
         <a class="btn btn-success btn-sm me-2" href="/profile.html">Tài khoản</a>
+        <a class="btn btn-outline-secondary btn-sm me-2" href="/about">Giới thiệu</a>
         <button class="btn btn-outline-secondary btn-sm" onclick="logout()">Đăng xuất</button>
     `;
     navAuthContainer.innerHTML = authHtml;

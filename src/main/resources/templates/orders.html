@@ -13,7 +13,7 @@
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/"><img src="/images/logo.jpg" alt="CandyShop Logo" style="height: 70px;"></a>
+    <a class="navbar-brand fw-bold" href="/"><img src="/images/logo.jpg" alt="Tiệm ngọt 108 Logo" style="height: 70px;"></a>
     <div id="nav-auth" class="ms-auto d-flex align-items-center">
         <!-- Auth state will be rendered here by JavaScript -->
     </div>
@@ -31,7 +31,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 mb-3">
-                <h5>CandyShop</h5>
+                <h5>Tiệm ngọt 108</h5>
                 <p>Mang đến những sản phẩm chất lượng, được làm thủ công với tất cả tình yêu và sự tỉ mỉ.</p>
             </div>
             <div class="col-md-4 mb-3">
@@ -39,16 +39,16 @@
                 <ul class="list-unstyled">
                     <li><a href="/">Trang chủ</a></li>
                     <li><a href="/#products-section">Sản phẩm</a></li>
-                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-3">
                 <h5>Liên hệ</h5>
-                <p>Email: ktd11082005@gmail.com<br>Phone: 0971735026</p>
+                <p>Email: ktd11082005@gmail.com<br>Phone: 0971735026<br>Địa chỉ: Thanh Xuân, Hà Nội</p>
             </div>
         </div>
         <div class="text-center pt-4 border-top">
-            <p>&copy; 2025 CandyShop.</p>
+            <p>&copy; 2025 Tiệm ngọt 108.</p>
         </div>
     </div>
 </footer>
@@ -161,22 +161,29 @@ async function updateNavbar() {
         } catch (e) { console.error(e); }
     }
     
+    let authHtml = '';
     if (token) {
-        navAuthContainer.innerHTML = `
+        // Simplified check as admin status may not be available on all pages
+        // or require another API call. For simplicity, assuming non-admin path.
+        authHtml = `
             <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
                 Giỏ hàng <span class="badge bg-danger ms-1">${cartItemCount}</span>
             </a>
             <a class="btn btn-info btn-sm me-2 active" href="/orders.html">Đơn hàng</a>
+            <a class="btn btn-success btn-sm me-2" href="/profile.html">Tài khoản</a>
+            <a class="btn btn-outline-secondary btn-sm me-2" href="/about">Giới thiệu</a>
             <button class="btn btn-outline-secondary btn-sm" onclick="logout()">Đăng xuất</button>
         `;
     } else {
-        navAuthContainer.innerHTML = `
+        authHtml = `
             <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
                 Giỏ hàng <span class="badge bg-danger ms-1">0</span>
             </a>
+            <a class="btn btn-outline-secondary btn-sm me-2" href="/about">Giới thiệu</a>
             <a class="btn btn-outline-secondary btn-sm" href="/login">Đăng nhập</a>
         `;
     }
+    navAuthContainer.innerHTML = authHtml;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
