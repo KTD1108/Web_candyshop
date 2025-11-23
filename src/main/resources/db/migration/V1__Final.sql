@@ -132,4 +132,4 @@ INSERT INTO products (name, slug, price, unit, thumbnail_url, stock_qty, status,
 ('Socola sữa hạnh nhân', 'socola-sua-hanh-nhan', 95000, 'thanh', 'https://havamall.com/wp-content/uploads/2021/03/Chocolate%20s%E1%BB%Afa%20b%E1%BB%8Dc%20h%E1%BA%A1nh%20nh%C3%A2n.jpg', 65, 'ACTIVE', 3, NOW()),
 ('Truffle socola', 'truffle-socola', 150000, 'hộp', 'https://bizweb.dktcdn.net/100/476/779/products/bce75840-dba1-4682-bdd3-9607613dfea7.jpg?v=1704512138363', 25, 'ACTIVE', 3, NOW()),
 ('Socola trắng dâu tây', 'socola-trang-dau-tay', 110000, 'thanh', 'https://i.pinimg.com/236x/10/2c/78/102c78bcb78061af4fcd76dceb4759f5.jpg', 40, 'ACTIVE', 3, NOW()),
-('Socola nóng', 'socola-nong', 65000, 'ly', 'https://zingsweets.com/wp-content/uploads/2020/11/9-loi-ich-suc-khoee-dang-ngac-nhien-cua-socola-nong-3-1024x768.jpg?x75504', 100, 'ACTIVE', 3, NOW());
+('Socola nóng', 'socola-nong', 65000, 'ly', 'https://zingsweets.com/wp-content/uploads/2020/11/9-loi-ich-suc-khoe-dang-ngac-nhien-cua-socola-nong-3-1024x768.jpg?x75504', 100, 'ACTIVE', 3, NOW());
