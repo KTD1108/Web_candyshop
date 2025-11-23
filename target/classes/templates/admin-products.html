@@ -86,7 +86,7 @@
           </div>
           <div class="mb-3">
             <label for="productImageUrl" class="form-label">URL ảnh</label>
-            <input type="text" class="form-control" id="productImageUrl">
+            <input type="text" class="form-control" id="productImageUrl" required>
           </div>
           <div class="mb-3">
             <label for="productStockQty" class="form-label">Số lượng tồn kho</label>
@@ -288,6 +288,7 @@
   function displayProducts(products) {
     productsTableBody.innerHTML = '';
     products.forEach(product => {
+      console.log('Product ID:', product.id, 'Image URL:', product.thumbnailUrl); // Debug log
       const row = productsTableBody.insertRow();
       row.innerHTML = `
         <td>${product.id}</td>
@@ -295,7 +296,7 @@
         <td>${product.description ? product.description.substring(0, 50) + '...' : ''}</td>
         <td>${product.price.toLocaleString('vi-VN')} VNĐ</td>
         <td>${product.category ? product.category.name : 'N/A'}</td>
-        <td><img src="${product.imageUrl}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+        <td><img src="${product.thumbnailUrl || 'https://via.placeholder.com/50'}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover;"></td>
         <td>${product.stockQty}</td>
         <td>
           <button class="btn btn-sm btn-warning edit-btn" data-id="${product.id}">Sửa</button>
@@ -403,7 +404,7 @@
       productNameInput.value = product.name;
       productDescriptionInput.value = product.description;
       productPriceInput.value = product.price;
-      productImageUrlInput.value = product.imageUrl;
+      productImageUrlInput.value = product.thumbnailUrl;
       productStockQtyInput.value = product.stockQty;
 
       await fetchCategories(); // Load categories before setting selected

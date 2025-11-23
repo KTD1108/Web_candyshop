@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users(
   email VARCHAR(120) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   full_name VARCHAR(120),
+  address VARCHAR(255) NULL,
+  phone VARCHAR(255) NULL,
   enabled TINYINT(1) DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -36,6 +38,7 @@ CREATE TABLE IF NOT EXISTS products(
   thumbnail_url VARCHAR(255),
   stock_qty INT DEFAULT 0,
   status VARCHAR(20) DEFAULT 'ACTIVE',
+  description TEXT,
   category_id BIGINT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_prod_cat FOREIGN KEY(category_id) REFERENCES categories(id)
@@ -63,6 +66,14 @@ CREATE TABLE IF NOT EXISTS orders(
   total_amount DECIMAL(12,2) NOT NULL,
   status VARCHAR(20) DEFAULT 'PENDING',
   shipping_address VARCHAR(255),
+  shipping_phone VARCHAR(255) NULL,
+  payment_method VARCHAR(255) NULL,
+  shipping_method VARCHAR(255) NULL,
+  order_notes TEXT NULL,
+  voucher_code VARCHAR(255) NULL,
+  discount_amount DECIMAL(12, 2) DEFAULT 0,
+  shipping_fee DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  internal_notes VARCHAR(255) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_user FOREIGN KEY(user_id) REFERENCES users(id)
 );
@@ -75,6 +86,20 @@ CREATE TABLE IF NOT EXISTS order_items(
   quantity INT NOT NULL,
   CONSTRAINT fk_oi_order FOREIGN KEY(order_id) REFERENCES orders(id),
   CONSTRAINT fk_oi_product FOREIGN KEY(product_id) REFERENCES products(id)
+);
+
+CREATE TABLE vouchers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    discount_type VARCHAR(50) NOT NULL,
+    discount_value DECIMAL(19, 2) NOT NULL,
+    max_discount_amount DECIMAL(19, 2),
+    min_order_amount DECIMAL(19, 2) NOT NULL DEFAULT 0,
+    valid_from TIMESTAMP NOT NULL,
+    valid_to TIMESTAMP NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    usage_limit INT NOT NULL,
+    current_usage INT NOT NULL DEFAULT 0
 );
 
 -- Initial roles
@@ -104,8 +129,7 @@ INSERT INTO products (name, slug, price, unit, thumbnail_url, stock_qty, status,
 
 -- Socola
 ('Socola đen 70%', 'socola-den-70', 85000, 'thanh', 'http://enjoycoffee.vn/wp-content/uploads/2023/11/z4885692003680_46d7987c2cffbedd5ce7dec7a86bcf65.jpg', 70, 'ACTIVE', 3, NOW()),
-('Socola sữa hạnh nhân', 'socola-sua-hanh-nhan', 95000, 'thanh', 'https://havamall.com/wp-content/uploads/2021/03/Chocolate%20s%E1%BB%AFa%20b%E1%BB%8Dc%20h%E1%BA%A1nh%20nh%C3%A2n.jpg', 65, 'ACTIVE', 3, NOW()),
+('Socola sữa hạnh nhân', 'socola-sua-hanh-nhan', 95000, 'thanh', 'https://havamall.com/wp-content/uploads/2021/03/Chocolate%20s%E1%BB%Afa%20b%E1%BB%8Dc%20h%E1%BA%A1nh%20nh%C3%A2n.jpg', 65, 'ACTIVE', 3, NOW()),
 ('Truffle socola', 'truffle-socola', 150000, 'hộp', 'https://bizweb.dktcdn.net/100/476/779/products/bce75840-dba1-4682-bdd3-9607613dfea7.jpg?v=1704512138363', 25, 'ACTIVE', 3, NOW()),
 ('Socola trắng dâu tây', 'socola-trang-dau-tay', 110000, 'thanh', 'https://i.pinimg.com/236x/10/2c/78/102c78bcb78061af4fcd76dceb4759f5.jpg', 40, 'ACTIVE', 3, NOW()),
-('Socola nóng', 'socola-nong', 65000, 'ly', 'https://zingsweets.com/wp-content/uploads/2020/11/9-loi-ich-suc-khoe-dang-ngac-nhien-cua-socola-nong-3-1024x768.jpg?x75504', 100, 'ACTIVE', 3, NOW());
-
+('Socola nóng', 'socola-nong', 65000, 'ly', 'https://zingsweets.com/wp-content/uploads/2020/11/9-loi-ich-suc-khoee-dang-ngac-nhien-cua-socola-nong-3-1024x768.jpg?x75504', 100, 'ACTIVE', 3, NOW());

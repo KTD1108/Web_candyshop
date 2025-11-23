@@ -114,6 +114,14 @@
 
   let currentOrderId = null;
 
+  const statusMap = {
+      "PENDING": "Chờ xử lý",
+      "PROCESSING": "Đang xử lý",
+      "SHIPPED": "Đã giao hàng",
+      "DELIVERED": "Đã nhận hàng",
+      "CANCELLED": "Đã hủy"
+  };
+
   function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -206,7 +214,7 @@
       detailOrderCustomer.textContent = order.user ? order.user.fullName : 'N/A';
       detailOrderCustomerEmail.textContent = order.user ? order.user.email : 'N/A';
       detailOrderTotal.textContent = order.totalAmount.toLocaleString('vi-VN') + ' VNĐ';
-      detailOrderDate.textContent = new Date(order.orderDate).toLocaleString();
+      detailOrderDate.textContent = new Date(order.createdAt).toLocaleString();
       orderStatusSelect.value = order.status;
 
       orderItemsList.innerHTML = '';
@@ -234,8 +242,8 @@
         <td>${order.id}</td>
         <td>${order.user ? order.user.fullName : 'N/A'} (${order.user ? order.user.email : 'N/A'})</td>
         <td>${order.totalAmount.toLocaleString('vi-VN')} VNĐ</td>
-        <td>${order.status}</td>
-        <td>${new Date(order.orderDate).toLocaleString()}</td>
+        <td>${statusMap[order.status] || order.status}</td>
+        <td>${new Date(order.createdAt).toLocaleString()}</td>
         <td>
           <button class="btn btn-sm btn-info view-edit-btn" data-id="${order.id}">Xem/Sửa</button>
           <button class="btn btn-sm btn-danger delete-btn" data-id="${order.id}">Xóa</button>

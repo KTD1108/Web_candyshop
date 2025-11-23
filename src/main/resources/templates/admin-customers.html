@@ -40,8 +40,7 @@
 <div class="container mt-5">
   <h2 class="mb-4">Quản lý khách hàng</h2>
 
-  <!-- Add Customer Button -->
-  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#customerModal" id="addCustomerBtn">Thêm khách hàng mới</button>
+
 
   <!-- Customer List Table -->
   <div class="table-responsive">
@@ -68,7 +67,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="customerModalLabel">Thêm/Sửa khách hàng</h5>
+        <h5 class="modal-title" id="customerModalLabel">Sửa khách hàng</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -113,7 +112,6 @@
   const customerFullNameInput = document.getElementById('customerFullName');
   const customerEnabledSelect = document.getElementById('customerEnabled');
   const customerRolesDiv = document.getElementById('customerRoles');
-  const addCustomerBtn = document.getElementById('addCustomerBtn');
   const logoutBtn = document.getElementById('logout-btn-dynamic');
 
   function showToast(message, type = 'success') {
@@ -251,18 +249,7 @@
     });
   }
 
-  addCustomerBtn.addEventListener('click', () => {
-    customerModalLabel.textContent = 'Thêm khách hàng mới';
-    customerForm.reset();
-    customerIdInput.value = '';
-    customerEmailInput.readOnly = false; // Email should be editable for new users
-    fetchRoles().then(() => {
-      // Uncheck all roles for new user
-      customerRolesDiv.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-      });
-    });
-  });
+
 
   customerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -270,6 +257,12 @@
     if (!token) return;
 
     const id = customerIdInput.value;
+    // For editing, 'id' must exist
+    if (!id) {
+        showToast('Lỗi: Không tìm thấy ID khách hàng để cập nhật.', 'error');
+        return;
+    }
+
     const email = customerEmailInput.value;
     const fullName = customerFullNameInput.value;
     const enabled = customerEnabledSelect.value === 'true';
@@ -284,39 +277,26 @@
     };
 
     try {
-      let res;
-      if (id) {
-        // Update customer
-        res = await fetch(`${API_BASE_URL}/admin/users/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(customerData)
-        });
-      } else {
-        // Add new customer
-        res = await fetch(`${API_BASE_URL}/admin/users`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(customerData)
-        });
-      }
-
+      // Update customer
+      const res = await fetch(`${API_BASE_URL}/admin/users/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(customerData)
+      });
+      
       if (!res.ok) {
-        throw new Error('Failed to save customer');
+        throw new Error('Failed to update customer');
       }
 
-      showToast(`Khách hàng đã được ${id ? 'cập nhật' : 'thêm'} thành công!`);
+      showToast('Khách hàng đã được cập nhật thành công!');
       customerModal.hide();
       fetchCustomers(); // Refresh customer list
     } catch (error) {
       console.error('Error saving customer:', error);
-      showToast('Lỗi khi lưu khách hàng.', 'error');
+      showToast('Lỗi khi cập nhật khách hàng.', 'error');
     }
   });
 
