@@ -23,11 +23,13 @@ public class ProductController {
 
     /** Danh sách sản phẩm (có tìm kiếm kw) */
     @GetMapping
-    public Page<Product> list(@RequestParam(required=false) String kw,
+    public Page<Product> list(@RequestParam(required = false) String kw,
                               @RequestParam(required = false) Long categoryId,
-                              @RequestParam(defaultValue="0") int page,
-                              @RequestParam(defaultValue="12") int size){
-        return service.search(kw, categoryId, page, size);
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "12") int size,
+                              @RequestParam(required = false) String sort,
+                              @RequestParam(required = false) String direction) {
+        return service.search(kw, categoryId, page, size, sort, direction);
     }
 
     /** Chi tiết sản phẩm */

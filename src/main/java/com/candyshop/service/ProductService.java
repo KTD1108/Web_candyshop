@@ -29,8 +29,16 @@ public class ProductService {
 		return productRepository.findAll();
 	}
 
-	public Page<Product> search(String kw, Long categoryId, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
+	public Page<Product> search(String kw, Long categoryId, int page, int size, String sort, String direction) {
+		Sort sortOrder;
+		if ("price".equals(sort)) {
+			Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+			sortOrder = Sort.by(sortDirection, "price");
+		} else {
+			sortOrder = Sort.by("name");
+		}
+
+		Pageable pageable = PageRequest.of(page, size, sortOrder);
 		if (categoryId != null) {
 			if (kw != null && !kw.isBlank()) {
 				return productRepository.findAllByNameContainingAndCategoryId(kw, categoryId, pageable);

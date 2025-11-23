@@ -52,7 +52,14 @@
 
     <section id="products-section" class="py-5 bg-white">
         <div class="container">
-            <h2 class="text-center mb-5 section-title">Tất cả sản phẩm</h2>
+            <h2 class="text-center mb-4 section-title">Tất cả sản phẩm</h2>
+            <div class="d-flex justify-content-end mb-3">
+                <select id="sort-select" class="form-select w-auto" onchange="loadProducts()">
+                    <option value="name,asc">Sắp xếp mặc định</option>
+                    <option value="price,asc">Giá: Thấp đến Cao</option>
+                    <option value="price,desc">Giá: Cao đến Thấp</option>
+                </select>
+            </div>
             <div id="grid" class="row g-4">
                 <!-- All products will be loaded here -->
             </div>
@@ -113,7 +120,11 @@ function showToast(message, type = 'success') {
 
 async function loadProducts(page=0){
   const kw = document.getElementById('kw').value || '';
-  let url = `http://localhost:8080/api/products?kw=${encodeURIComponent(kw)}&page=${page}&size=16`;
+  const sortSelect = document.getElementById('sort-select');
+  const sortValue = sortSelect ? sortSelect.value : 'name,asc';
+  const [sort, direction] = sortValue.split(',');
+
+  let url = `http://localhost:8080/api/products?kw=${encodeURIComponent(kw)}&page=${page}&size=16&sort=${sort}&direction=${direction}`;
   if (currentCategoryId) {
       url += `&categoryId=${currentCategoryId}`;
   }
