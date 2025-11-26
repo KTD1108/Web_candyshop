@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS order_items(
   price DECIMAL(12,2) NOT NULL,
   quantity INT NOT NULL,
   CONSTRAINT fk_oi_order FOREIGN KEY(order_id) REFERENCES orders(id),
-  CONSTRAINT fk_oi_product FOREIGN KEY(product_id) REFERENCES products(id)
+  CONSTRAINT fk_oi_product FOREIGN KEY(product_id) REFERENCES products(id) 
 );
 
 CREATE TABLE vouchers (

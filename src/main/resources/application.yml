@@ -13,12 +13,12 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    # baseline-on-migrate: true   # CHỈ bật nếu DB đã có sẵn bảng
+    # baseline-on-migrate: true   # Chỉ bật nếu DB đã có sẵn bảng
 
 server:
   port: 8080
 
 app:
   jwt:
-    secret: "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_32+_CHARS"
+    secret: "aT92!kF7#QpL0zXy8mN3vR5sU1bC4dW6eH9jK2tG7rP0fL"
     expiration: 3600000

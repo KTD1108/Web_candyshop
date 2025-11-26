@@ -3,6 +3,7 @@ package com.candyshop.service;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -63,5 +64,22 @@ public class VoucherService {
 		return allVouchers.stream().filter(Voucher::isActive).filter(v -> !now.isAfter(v.getValidTo()))
 				.filter(v -> !now.isBefore(v.getValidFrom())).filter(v -> v.getCurrentUsage() < v.getUsageLimit())
 				.filter(v -> subtotal.compareTo(v.getMinOrderAmount()) >= 0).toList();
+	}
+
+	// Admin CRUD operations
+	public List<Voucher> findAll() {
+		return voucherRepository.findAll();
+	}
+
+	public Optional<Voucher> findById(Long id) {
+		return voucherRepository.findById(id);
+	}
+
+	public Voucher save(Voucher voucher) {
+		return voucherRepository.save(voucher);
+	}
+
+	public void deleteById(Long id) {
+		voucherRepository.deleteById(id);
 	}
 }

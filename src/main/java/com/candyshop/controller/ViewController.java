@@ -80,4 +80,9 @@ public class ViewController {
     public String adminStatistics() {
         return "admin-statistics";
     }
+
+    @GetMapping("/admin-vouchers.html")
+    public String adminVouchers() {
+        return "admin-vouchers";
+    }
 }

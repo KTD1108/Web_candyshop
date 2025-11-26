@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý mã giảm giá</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/"><img src="/images/logo.jpg" alt="Tiệm ngọt 108 Logo" style="height: 70px;"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div id="nav-auth" class="ms-auto d-flex align-items-center">
+        <!-- Auth state will be rendered here by JavaScript -->
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2 class="mb-4">Quản lý mã giảm giá</h2>
+
+  <!-- Add Voucher Button -->
+  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#voucherModal" id="addVoucherBtn">Thêm mã giảm giá mới</button>
+
+  <!-- Voucher List Table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Mã</th>
+          <th>Giá trị giảm</th>
+          <th>Đơn tối thiểu</th>
+          <th>Giới hạn sử dụng</th>
+          <th>Ngày hết hạn</th>
+          <th>Active</th>
+          <th>Số lượt đã dùng</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="vouchersTableBody">
+        <!-- Voucher rows will be loaded here by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Voucher Add/Edit Modal -->
+<div class="modal fade" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="voucherModalLabel">Thêm/Sửa mã giảm giá</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="voucherForm">
+          <input type="hidden" id="voucherId">
+          <div class="mb-3">
+            <label for="voucherCode" class="form-label">Mã giảm giá</label>
+            <input type="text" class="form-control" id="voucherCode" required>
+          </div>
+          <div class="mb-3">
+            <label for="discountValue" class="form-label">Giá trị giảm</label>
+            <input type="number" class="form-control" id="discountValue" step="0.01" required>
+          </div>
+          <div class="mb-3">
+            <label for="discountType" class="form-label">Loại giảm giá</label>
+            <select class="form-select" id="discountType" required>
+              <option value="" disabled selected>Chọn loại giảm giá</option>
+              <option value="PERCENTAGE">Phần trăm</option>
+              <option value="FIXED_AMOUNT">Số tiền cố định</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="minimumOrderAmount" class="form-label">Đơn tối thiểu</label>
+            <input type="number" class="form-control" id="minimumOrderAmount" step="0.01" required>
+          </div>
+          <div class="mb-3">
+            <label for="usageLimit" class="form-label">Giới hạn sử dụng</label>
+            <input type="number" class="form-control" id="usageLimit" required min="0">
+          </div>
+          <div class="mb-3">
+            <label for="validFromDate" class="form-label">Ngày hiệu lực</label>
+            <input type="date" class="form-control" id="validFromDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Ngày hết hạn</label>
+            <input type="date" class="form-control" id="expiryDate">
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="voucherActive">
+            <label class="form-check-label" for="voucherActive">Hoạt động</label>
+          </div>
+          <button type="button" class="btn btn-primary" id="saveVoucherBtn">Lưu mã giảm giá</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const API_BASE_URL = 'http://localhost:8080/api';
+  const VOUCHER_ADMIN_API_URL = `${API_BASE_URL}/admin/vouchers`;
+  const vouchersTableBody = document.getElementById('vouchersTableBody');
+  const voucherModal = new bootstrap.Modal(document.getElementById('voucherModal'));
+  const voucherForm = document.getElementById('voucherForm');
+  const voucherIdInput = document.getElementById('voucherId');
+  const voucherCodeInput = document.getElementById('voucherCode');
+  const discountValueInput = document.getElementById('discountValue');
+  const discountTypeInput = document.getElementById('discountType');
+  const minimumOrderAmountInput = document.getElementById('minimumOrderAmount');
+  const usageLimitInput = document.getElementById('usageLimit');
+  const validFromDateInput = document.getElementById('validFromDate');
+  const expiryDateInput = document.getElementById('expiryDate');
+  const voucherActiveInput = document.getElementById('voucherActive');
+  const addVoucherBtn = document.getElementById('addVoucherBtn');
+  const saveVoucherBtn = document.getElementById('saveVoucherBtn');
+
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.addEventListener('transitionend', () => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      });
+    }, 3000);
+  }
+
+  async function checkAdminStatus() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      window.location.href = '/login';
+      return false;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/validate`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.status === 403) {
+        showToast('Bạn không có quyền truy cập trang này.', 'error');
+        setTimeout(() => { window.location.href = '/'; }, 1500);
+        return false;
+      }
+      if (!res.ok) {
+        throw new Error('Failed to validate token');
+      }
+      const data = await res.json();
+      if (!data.isAdmin) {
+        showToast('Bạn không có quyền truy cập trang này.', 'error');
+        setTimeout(() => { window.location.href = '/'; }, 1500);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error validating token:', error);
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+      return false;
+    }
+  }
+
+  async function updateNavbar() {
+    const token = localStorage.getItem('accessToken');
+    const navAuthContainer = document.getElementById('nav-auth');
+    let cartItemCount = 0;
+    let isAdmin = false;
+
+    if (token) {
+        isAdmin = await checkAdminStatus(); // Get isAdmin status
+        try {
+            const res = await fetch('http://localhost:8080/api/cart', { headers: { 'Authorization': 'Bearer ' + token } });
+            if (res.ok) {
+                const cart = await res.json();
+                cartItemCount = cart.cartItems.length;
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    let authHtml = '';
+    if (token) {
+        if (isAdmin) {
+            authHtml = `
+                <div class="dropdown me-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Khu vực quản trị
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="/admin-products.html">Quản lý sản phẩm</a></li>
+                        <li><a class="dropdown-item" href="/admin-customers.html">Quản lý khách hàng</a></li>
+                        <li><a class="dropdown-item" href="/admin-orders.html">Quản lý đơn hàng</a></li>
+                        <li><a class="dropdown-item" href="/admin-vouchers.html">Quản lý mã giảm giá</a></li>
+                    </ul>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" id="logout-btn-dynamic" onclick="logout()">Đăng xuất</button>
+            `;
+        } else {
+            authHtml = `
+                <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
+                    Giỏ hàng <span class="badge bg-danger ms-1">${cartItemCount}</span>
+                </a>
+                <a class="btn btn-info btn-sm me-2" href="/orders.html">Đơn hàng</a>
+                <button class="btn btn-outline-secondary btn-sm" id="logout-btn-dynamic" onclick="logout()">Đăng xuất</button>
+            `;
+        }
+    } else {
+        authHtml = `
+            <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
+                Giỏ hàng <span class="badge bg-danger ms-1">0</span>
+            </a>
+            <a class="btn btn-outline-secondary btn-sm" href="/login">Đăng nhập</a>
+        `;
+    }
+    navAuthContainer.innerHTML = authHtml;
+
+    const dynamicLogoutBtn = document.getElementById('logout-btn-dynamic');
+    if (dynamicLogoutBtn) {
+        dynamicLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('accessToken');
+            window.location.href = '/login';
+        });
+    }
+  }
+
+
+  async function fetchVouchers() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const res = await fetch(VOUCHER_ADMIN_API_URL, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch vouchers');
+      }
+      const vouchers = await res.json();
+      displayVouchers(vouchers);
+    } catch (error) {
+      console.error('Error fetching vouchers:', error);
+      showToast('Lỗi khi tải mã giảm giá.', 'error');
+    }
+  }
+
+  function displayVouchers(vouchers) {
+    vouchersTableBody.innerHTML = '';
+    vouchers.forEach(voucher => {
+      const row = vouchersTableBody.insertRow();
+      const expiry = voucher.validTo ? new Date(voucher.validTo).toLocaleDateString('vi-VN') : 'N/A';
+      row.innerHTML = `
+        <td>${voucher.id}</td>
+        <td>${voucher.code}</td>
+        <td>${voucher.discountValue.toLocaleString('vi-VN')}</td>
+        <td>${voucher.minOrderAmount.toLocaleString('vi-VN')} VNĐ</td>
+        <td>${voucher.usageLimit}</td>
+        <td>${expiry}</td>
+        <td>${voucher.active ? 'Có' : 'Không'}</td>
+        <td>${voucher.currentUsage}</td>
+        <td>
+          <button class="btn btn-sm btn-warning edit-btn" data-id="${voucher.id}">Sửa</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-id="${voucher.id}">Xóa</button>
+        </td>
+      `;
+    });
+
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const voucherId = e.target.dataset.id;
+        editVoucher(voucherId);
+      });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const voucherId = e.target.dataset.id;
+        deleteVoucher(voucherId);
+      });
+    });
+  }
+
+  addVoucherBtn.addEventListener('click', () => {
+    document.getElementById('voucherModalLabel').textContent = 'Thêm mã giảm giá mới';
+    voucherForm.reset();
+    voucherIdInput.value = '';
+    voucherActiveInput.checked = true; // Default to active
+  });
+
+  saveVoucherBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const id = voucherIdInput.value;
+    const code = voucherCodeInput.value;
+    const discountValue = parseFloat(discountValueInput.value);
+    const discountType = discountTypeInput.value;
+    const minOrderAmount = parseFloat(minimumOrderAmountInput.value);
+    const usageLimit = parseInt(usageLimitInput.value);
+    const validFrom = validFromDateInput.value ? new Date(validFromDateInput.value).toISOString() : null;
+    const validTo = expiryDateInput.value ? new Date(expiryDateInput.value).toISOString() : null;
+    const active = voucherActiveInput.checked;
+
+    const voucherData = {
+      code,
+      discountValue,
+      discountType,
+      minOrderAmount,
+      usageLimit,
+      validFrom,
+      validTo,
+      active,
+      currentUsage: 0 // Used count is not editable from admin UI
+    };
+
+    try {
+      let res;
+      if (id) {
+        // Update voucher
+        res = await fetch(`${VOUCHER_ADMIN_API_URL}/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(voucherData)
+        });
+      } else {
+        // Add new voucher
+        res = await fetch(VOUCHER_ADMIN_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(voucherData)
+        });
+      }
+
+      if (!res.ok) {
+        const errorBody = await res.json();
+        throw new Error(errorBody.message || 'Failed to save voucher');
+      }
+
+      showToast(`Mã giảm giá đã được ${id ? 'cập nhật' : 'thêm'} thành công!`);
+      voucherModal.hide();
+      fetchVouchers(); // Refresh voucher list
+    } catch (error) {
+      console.error('Error saving voucher:', error);
+      showToast(error.message || 'Lỗi khi lưu mã giảm giá.', 'error');
+    }
+  });
+
+  async function editVoucher(voucherId) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${VOUCHER_ADMIN_API_URL}/${voucherId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch voucher for editing');
+      }
+      const voucher = await res.json();
+
+      document.getElementById('voucherModalLabel').textContent = 'Sửa mã giảm giá';
+      voucherIdInput.value = voucher.id;
+      voucherCodeInput.value = voucher.code;
+      discountValueInput.value = voucher.discountValue;
+      discountTypeInput.value = voucher.discountType;
+      minimumOrderAmountInput.value = voucher.minOrderAmount;
+      usageLimitInput.value = voucher.usageLimit;
+      if (voucher.validFrom) {
+        validFromDateInput.value = voucher.validFrom.split('T')[0]; // Format for date input
+      } else {
+        validFromDateInput.value = '';
+      }
+      if (voucher.validTo) {
+        expiryDateInput.value = voucher.validTo.split('T')[0]; // Format for date input
+      } else {
+        expiryDateInput.value = '';
+      }
+      voucherActiveInput.checked = voucher.active;
+
+      voucherModal.show();
+    } catch (error) {
+      console.error('Error editing voucher:', error);
+      showToast('Lỗi khi tải thông tin mã giảm giá để chỉnh sửa.', 'error');
+    }
+  }
+
+  async function deleteVoucher(voucherId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa mã giảm giá này không?')) {
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${VOUCHER_ADMIN_API_URL}/${voucherId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete voucher');
+      }
+
+      showToast('Mã giảm giá đã được xóa thành công!');
+      fetchVouchers(); // Refresh voucher list
+    } catch (error) {
+      console.error('Error deleting voucher:', error);
+      showToast('Lỗi khi xóa mã giảm giá.', 'error');
+    }
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', async () => {
+    await updateNavbar();
+    const isAdmin = await checkAdminStatus();
+    if (isAdmin) {
+      fetchVouchers();
+    }
+  });
+</script>
+</body>
+</html>
