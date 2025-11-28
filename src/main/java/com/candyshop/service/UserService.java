@@ -1,7 +1,14 @@
 package com.candyshop.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.candyshop.dto.UserUpdateRequest;
-import com.candyshop.entity.Cart;
 import com.candyshop.entity.Order;
 import com.candyshop.entity.Role;
 import com.candyshop.entity.User;
@@ -9,112 +16,115 @@ import com.candyshop.repository.CartRepository;
 import com.candyshop.repository.OrderRepository;
 import com.candyshop.repository.RoleRepository;
 import com.candyshop.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+//  xử lý logic nghiệp vụ liên quan đến quản lý người dùng, bao gồm các hoạt động CRUD, cập nhật hồ sơ và thay đổi mật khẩu.
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final CartRepository cartRepository;
-    private final OrderRepository orderRepository;
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final CartRepository cartRepository;
+	private final OrderRepository orderRepository;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+	// Lấy tất cả người dùng trong hệ thống.
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
+	// Lấy thông tin người dùng bằng ID.
+	public User getUserById(Long id) {
+		return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+	}
 
-    @Transactional
-    public User createUser(UserUpdateRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
-        }
+	// Tạo một người dùng mới.
+	@Transactional
+	public User createUser(UserUpdateRequest request) {
+		if (userRepository.existsByEmail(request.getEmail())) {
+			throw new RuntimeException("Email already registered");
+		}
 
-        User user = new User();
-        user.setEmail(request.getEmail());
-        // For simplicity, a default password or a generated one could be set here.
-        // In a real application, this would involve a more secure password management.
-        user.setPasswordHash(passwordEncoder.encode("defaultPassword")); // Set a default password
-        user.setFullName(request.getFullName());
-        user.setEnabled(request.getEnabled());
+		User user = new User();
+		user.setEmail(request.getEmail());
+		// Đặt mật khẩu mặc định và mã hóa.
+		user.setPasswordHash(passwordEncoder.encode("defaultPassword"));
+		user.setFullName(request.getFullName());
+		user.setEnabled(request.getEnabled());
 
-        Set<Role> roles = request.getRoleIds().stream()
-                .map(roleId -> roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found")))
-                .collect(Collectors.toSet());
-        user.setRoles(roles);
+		// Gán các vai trò (roles) cho người dùng.
+		Set<Role> roles = request.getRoleIds().stream().map(
+				roleId -> roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found")))
+				.collect(Collectors.toSet());
+		user.setRoles(roles);
 
-        return userRepository.save(user);
-    }
+		return userRepository.save(user);
+	}
 
-    @Transactional
-    public User updateUser(Long id, UserUpdateRequest request) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+	// Cập nhật thông tin của một người dùng hiện có.
+	@Transactional
+	public User updateUser(Long id, UserUpdateRequest request) {
+		User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-        existingUser.setFullName(request.getFullName());
-        existingUser.setEnabled(request.getEnabled());
+		existingUser.setFullName(request.getFullName());
+		existingUser.setEnabled(request.getEnabled());
 
-        Set<Role> roles = request.getRoleIds().stream()
-                .map(roleId -> roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found")))
-                .collect(Collectors.toSet());
-        existingUser.setRoles(roles);
+		// Cập nhật các vai trò của người dùng.
+		Set<Role> roles = request.getRoleIds().stream().map(
+				roleId -> roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found")))
+				.collect(Collectors.toSet());
+		existingUser.setRoles(roles);
 
-        return userRepository.save(existingUser);
-    }
+		return userRepository.save(existingUser);
+	}
 
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+	// Xóa một người dùng khỏi hệ thống.
+	@Transactional
+	public void deleteUser(Long id) {
+		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Disassociate orders from the user (set user_id to null)
-        List<Order> userOrders = orderRepository.findByUser(user);
-        for (Order order : userOrders) {
-            order.setUser(null);
-            orderRepository.save(order);
-        }
+		// Hủy liên kết các đơn hàng của người dùng (đặt user_id thành null để không xóa
+		// đơn hàng).
+		List<Order> userOrders = orderRepository.findByUser(user);
+		for (Order order : userOrders) {
+			order.setUser(null);
+			orderRepository.save(order);
+		}
 
-        // Delete user's cart if exists
-        cartRepository.findByUser(user).ifPresent(cartRepository::delete);
+		// Xóa giỏ hàng của người dùng nếu tồn tại.
+		cartRepository.findByUser(user).ifPresent(cartRepository::delete);
 
-        userRepository.delete(user);
-    }
+		userRepository.delete(user);
+	}
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
-    }
+	// Lấy thông tin người dùng bằng địa chỉ email.
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found for email: " + email));
+	}
 
-    @Transactional
-    public void updateProfile(String email, com.candyshop.dto.ProfileUpdateRequest request) {
-        User user = getUserByEmail(email);
-        user.setFullName(request.getFullName());
-        user.setAddress(request.getAddress());
-        user.setPhone(request.getPhone());
-        userRepository.save(user);
-    }
+	// Cập nhật thông tin hồ sơ của người dùng hiện tại.
+	@Transactional
+	public void updateProfile(String email, com.candyshop.dto.ProfileUpdateRequest request) {
+		User user = getUserByEmail(email);
+		user.setFullName(request.getFullName());
+		user.setAddress(request.getAddress());
+		user.setPhone(request.getPhone());
+		userRepository.save(user);
+	}
 
-    @Transactional
-    public void changePassword(String email, com.candyshop.dto.ChangePasswordRequest request) {
-        User user = getUserByEmail(email);
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid old password");
-        }
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-    }
+	// Thay đổi mật khẩu của người dùng hiện tại.
+	@Transactional
+	public void changePassword(String email, com.candyshop.dto.ChangePasswordRequest request) {
+		User user = getUserByEmail(email);
+		// Kiểm tra mật khẩu cũ có đúng không.
+		if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+			throw new RuntimeException("Invalid old password");
+		}
+		// Mã hóa và lưu mật khẩu mới.
+		user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+	}
 }

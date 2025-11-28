@@ -57,7 +57,6 @@
         </tr>
       </thead>
       <tbody id="customersTableBody">
-        <!-- Customer rows will be loaded here by JavaScript -->
       </tbody>
     </table>
   </div>
@@ -191,7 +190,7 @@
 
   async function fetchRoles() {
     const token = localStorage.getItem('accessToken');
-    if (!token) return; // Should not happen if checkAdminStatus works
+    if (!token) return;
 
     try {
       const res = await fetch(`${API_BASE_URL}/roles`, {
@@ -294,7 +293,7 @@
 
       showToast('Khách hàng đã được cập nhật thành công!');
       customerModal.hide();
-      fetchCustomers(); // Refresh customer list
+      fetchCustomers(); 
     } catch (error) {
       console.error('Error saving customer:', error);
       showToast('Lỗi khi cập nhật khách hàng.', 'error');
@@ -317,7 +316,7 @@
       customerModalLabel.textContent = 'Sửa khách hàng';
       customerIdInput.value = customer.id;
       customerEmailInput.value = customer.email;
-      customerEmailInput.readOnly = true; // Email should not be editable for existing users
+      customerEmailInput.readOnly = true; 
       customerFullNameInput.value = customer.fullName;
       customerEnabledSelect.value = customer.enabled.toString();
 

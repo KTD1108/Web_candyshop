@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+//xử lý logic nghiệp vụ liên quan đến quản lý mã giảm giá (voucher), bao gồm xác thực, tính toán giảm giá và các thao tác CRUD.
 public class VoucherService {
 
 	private final VoucherRepository voucherRepository;
@@ -23,8 +24,10 @@ public class VoucherService {
 		return voucherRepository.findByCode(code).orElseThrow(() -> new RuntimeException("Mã giảm giá không hợp lệ"));
 	}
 
+	// Tính toán số tiền giảm giá dựa trên mã giảm giá và tổng tiền đơn hàng phụ
+	// (subtotal).
 	public BigDecimal calculateDiscount(Voucher voucher, BigDecimal subtotal) {
-		// Rule validation
+		// ----- Quy tắc xác thực mã giảm giá -----
 		if (!voucher.isActive()) {
 			throw new RuntimeException("Mã giảm giá đã bị vô hiệu hóa.");
 		}
@@ -42,43 +45,56 @@ public class VoucherService {
 					voucher.getMinOrderAmount().toPlainString()));
 		}
 
-		// Discount calculation
+		// ----- Tính toán giảm giá -----
 		BigDecimal discountAmount;
 		if (voucher.getDiscountType() == DiscountType.PERCENTAGE) {
+			// Tính giảm giá theo phần trăm.
 			discountAmount = subtotal.multiply(voucher.getDiscountValue().divide(new BigDecimal("100")));
+			// Áp dụng giới hạn giảm giá tối đa nếu có.
 			if (voucher.getMaxDiscountAmount() != null
 					&& discountAmount.compareTo(voucher.getMaxDiscountAmount()) > 0) {
 				discountAmount = voucher.getMaxDiscountAmount();
 			}
 		} else { // FIXED_AMOUNT
+			// Giảm giá theo số tiền cố định.
 			discountAmount = voucher.getDiscountValue();
 		}
 
 		return discountAmount;
 	}
 
+	// Lấy danh sách các mã giảm giá hiện có thể áp dụng dựa trên tổng tiền đơn hàng
+	// phụ.
 	public List<Voucher> getAvailableVouchers(BigDecimal subtotal) {
 		List<Voucher> allVouchers = voucherRepository.findAll();
 		Instant now = Instant.now();
 
+		// Lọc các mã giảm giá theo điều kiện: đang hoạt động, chưa hết hạn, đã có hiệu
+		// lực,
+		// còn lượt sử dụng và đáp ứng tổng tiền đơn hàng tối thiểu.
 		return allVouchers.stream().filter(Voucher::isActive).filter(v -> !now.isAfter(v.getValidTo()))
 				.filter(v -> !now.isBefore(v.getValidFrom())).filter(v -> v.getCurrentUsage() < v.getUsageLimit())
 				.filter(v -> subtotal.compareTo(v.getMinOrderAmount()) >= 0).toList();
 	}
 
-	// Admin CRUD operations
+	// ----- Các thao tác CRUD cho quản trị viên -----
+
+	// Lấy tất cả các mã giảm giá.
 	public List<Voucher> findAll() {
 		return voucherRepository.findAll();
 	}
 
+	// Tìm mã giảm giá bằng ID.
 	public Optional<Voucher> findById(Long id) {
 		return voucherRepository.findById(id);
 	}
 
+	// Lưu (tạo mới hoặc cập nhật) một mã giảm giá.
 	public Voucher save(Voucher voucher) {
 		return voucherRepository.save(voucher);
 	}
 
+	// Xóa một mã giảm giá bằng ID.
 	public void deleteById(Long id) {
 		voucherRepository.deleteById(id);
 	}

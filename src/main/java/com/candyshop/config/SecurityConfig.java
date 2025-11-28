@@ -27,6 +27,7 @@ import com.candyshop.security.JwtAuthFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+// Lớp cấu hình chính cho Spring Security, quản lý các quy tắc bảo mật của ứng dụng.
 public class SecurityConfig {
 
 	private final JwtAuthFilter jwtAuthFilter;
@@ -37,12 +38,15 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	// Cấu hình chuỗi bộ lọc bảo mật (security filter chain), đây là nơi định nghĩa các quy tắc truy cập.
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider)
 			throws Exception {
-		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+		http.csrf(csrf -> csrf.disable()) // Tắt tính năng chống tấn công CSRF vì dùng JWT (stateless)
+				.cors(cors -> cors.configurationSource(corsConfigurationSource())) // Áp dụng cấu hình CORS
+				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Cấu hình session thành STATELESS, không lưu trạng thái phía server
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()) // Cho phép tất cả các request (sẽ được cấu hình chi tiết hơn ở controller)
 				.authenticationProvider(authenticationProvider)
+				// Thêm bộ lọc JWT để kiểm tra token trước bộ lọc mặc định của Spring Security
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
@@ -58,6 +62,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	// Cung cấp bean để mã hóa mật khẩu, sử dụng thuật toán BCrypt.
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
@@ -68,13 +73,14 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	// Cấu hình CORS (Cross-Origin Resource Sharing) để cho phép các client từ nguồn khác (ví dụ: frontend) có thể gọi API.
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration c = new CorsConfiguration();
-		c.setAllowedOrigins(List.of("*"));
-		c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-		c.setAllowedHeaders(List.of("*"));
+		c.setAllowedOrigins(List.of("*")); // Cho phép tất cả các nguồn
+		c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // Cho phép tất cả các phương thức HTTP
+		c.setAllowedHeaders(List.of("*")); // Cho phép tất cả các header
 		UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
-		src.registerCorsConfiguration("/**", c);
+		src.registerCorsConfiguration("/**", c); // Áp dụng cấu hình cho tất cả các đường dẫn
 		return src;
 	}
 }

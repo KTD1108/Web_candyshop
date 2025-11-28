@@ -1,7 +1,6 @@
 package com.candyshop.controller;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,24 +25,25 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến xác thực và ủy quyền người dùng.
 public class AuthController {
 
 	private final AuthService authService;
 
-	/** Đăng ký tài khoản mới (ROLE_USER) */
+	// Xử lý yêu cầu đăng ký tài khoản mới.
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody RegisterRequest dto) {
 		authService.register(dto);
 		return ResponseEntity.ok(Map.of("message", "registered"));
 	}
 
-	/** Đăng nhập -> trả về JWT accessToken */
+	// Xử lý yêu cầu đăng nhập và trả về JWT accessToken.
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest dto) {
 		return ResponseEntity.ok(authService.login(dto));
 	}
 
-	/** Lấy thông tin người dùng hiện tại (từ JWT) */
+	// Lấy thông tin chi tiết của người dùng hiện tại.
 	@GetMapping("/me")
 	public ResponseEntity<?> me(@AuthenticationPrincipal CustomUserDetails cud) {
 		if (cud == null) {
@@ -53,16 +53,17 @@ public class AuthController {
 				cud.getUser().getFullName(), "roles", cud.getAuthorities()));
 	}
 
-	/** Validate token and check admin status */
+	// Xác thực token JWT và kiểm tra quyền admin.
 	@GetMapping("/validate")
 	public ResponseEntity<?> validate() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
+		boolean isAuthenticated = authentication != null && authentication.isAuthenticated()
+				&& !(authentication.getPrincipal() instanceof String
+						&& authentication.getPrincipal().equals("anonymousUser"));
 		boolean isAdmin = false;
 
 		if (isAuthenticated) {
-			isAdmin = authentication.getAuthorities().stream()
-					.map(GrantedAuthority::getAuthority)
+			isAdmin = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 					.anyMatch(role -> role.equals("ROLE_ADMIN"));
 		}
 		return ResponseEntity.ok(Map.of("isAuthenticated", isAuthenticated, "isAdmin", isAdmin));

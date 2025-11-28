@@ -77,7 +77,7 @@ async function checkAdminStatus() {
 }
 
 async function loadProductDetail() {
-    await updateNavbar(); // Ensure navbar is updated and isAdmin status is potentially fetched
+    await updateNavbar(); 
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('id');
 
@@ -202,7 +202,7 @@ async function updateNavbar() {
     let isAdmin = false;
 
     if (token) {
-        isAdmin = await checkAdminStatus(); // Get isAdmin status
+        isAdmin = await checkAdminStatus(); 
         try {
             const res = await fetch('http://localhost:8080/api/cart', { headers: { 'Authorization': 'Bearer ' + token } });
             if (res.ok) {

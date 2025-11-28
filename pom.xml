@@ -7,14 +7,14 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.3</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/> 
   </parent>
 
   <groupId>com.candyshop</groupId>
   <artifactId>candyshop</artifactId>
   <version>1.0.0</version>
   <name>CandyShop</name>
-  <description>Full-stack CandyShop backend with Spring Boot + JWT + MySQL + Flyway</description>
+  <description>Full-stack </description>
   <properties>
     <java.version>21</java.version>
     <jjwt.version>0.11.5</jjwt.version>

@@ -94,7 +94,7 @@
         }, 3000);
     }
     
-    // --- Navbar Logic (Copied from index.html for consistency) ---
+  
     function logout() {
         localStorage.removeItem('accessToken');
         window.location = '/login.html';
@@ -162,7 +162,7 @@
         }
         navAuthContainer.innerHTML = authHtml;
     }
-    // --- End Navbar Logic ---
+   
 
     document.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('accessToken');
@@ -174,7 +174,7 @@
 
         await updateNavbar();
 
-        // Fetch and populate profile data
+      
         try {
             const res = await fetch('http://localhost:8080/api/user/profile', {
                 headers: { 'Authorization': 'Bearer ' + token }
@@ -190,7 +190,7 @@
             showToast(error.message, 'error');
         }
 
-        // Handle profile update
+     
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const payload = {
@@ -216,7 +216,7 @@
             }
         });
 
-        // Handle password change
+       
         document.getElementById('password-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const oldPassword = document.getElementById('oldPassword').value;

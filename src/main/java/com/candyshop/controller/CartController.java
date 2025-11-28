@@ -29,11 +29,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến quản lý giỏ hàng của người dùng.
 public class CartController {
 
 	private final CartService cartService;
 
-	/** Lấy giỏ hàng của user hiện tại (đã bao gồm các items) */
+	// Xử lý yêu cầu GET để lấy giỏ hàng của người dùng hiện tại.
 	@GetMapping
 	public ResponseEntity<Cart> getCart(@AuthenticationPrincipal CustomUserDetails cud) {
 		User u = cud.getUser();
@@ -41,7 +42,7 @@ public class CartController {
 		return ResponseEntity.ok(c);
 	}
 
-	/** Thêm sản phẩm vào giỏ */
+	// Xử lý yêu cầu POST để thêm sản phẩm vào giỏ hàng.
 	@PostMapping("/items")
 	public ResponseEntity<?> addItem(@AuthenticationPrincipal CustomUserDetails cud,
 			@RequestBody AddCartItemRequest req) {
@@ -49,7 +50,7 @@ public class CartController {
 		return ResponseEntity.ok(Map.of("message", "added"));
 	}
 
-	/** Cập nhật số lượng của một item */
+	// Xử lý yêu cầu PUT để cập nhật số lượng của một mục trong giỏ hàng.
 	@PutMapping("/items/{cartItemId}")
 	public ResponseEntity<?> updateItem(@PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemRequest req,
 			@AuthenticationPrincipal CustomUserDetails cud) {
@@ -60,7 +61,7 @@ public class CartController {
 		return ResponseEntity.ok(updatedItem);
 	}
 
-	/** Xóa một item khỏi giỏ hàng */
+	// Xử lý yêu cầu DELETE để xóa một mục khỏi giỏ hàng.
 	@DeleteMapping("/items/{itemId}")
 	public ResponseEntity<?> deleteItem(@PathVariable Long itemId, @AuthenticationPrincipal CustomUserDetails cud) {
 		cartService.deleteItem(itemId, cud.getUser());

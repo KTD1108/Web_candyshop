@@ -102,16 +102,16 @@ CREATE TABLE vouchers (
     current_usage INT NOT NULL DEFAULT 0
 );
 
--- Initial roles
+
 INSERT IGNORE INTO roles(name) VALUES ('ROLE_USER'), ('ROLE_ADMIN');
 
--- Seed Categories
+
 INSERT INTO categories (id, name, slug) VALUES
 (1, 'Kẹo', 'keo'),
 (2, 'Bánh', 'banh'),
 (3, 'Sô-cô-la', 'socola');
 
--- Seed Products
+
 INSERT INTO products (name, slug, price, unit, thumbnail_url, stock_qty, status, category_id, created_at) VALUES
 -- Kẹo
 ('Kẹo dẻo trái cây', 'keo-deo-trai-cay', 35000, 'gói', '/images/keo-deo-trai-cay.jpg', 100, 'ACTIVE', 1, NOW()),

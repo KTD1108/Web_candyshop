@@ -15,10 +15,12 @@ import java.util.List;
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến quản lý và truy xuất vai trò người dùng.
 public class RoleController {
 
     private final RoleRepository roleRepository;
 
+    // Xử lý yêu cầu GET để lấy tất cả các vai trò người dùng.
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(roleRepository.findAll());

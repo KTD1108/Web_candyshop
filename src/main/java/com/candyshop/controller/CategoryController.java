@@ -14,10 +14,12 @@ import java.util.List;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến quản lý và truy xuất danh mục sản phẩm.
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
 
+    // Xử lý yêu cầu GET để lấy tất cả các danh mục sản phẩm.
     @GetMapping
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();

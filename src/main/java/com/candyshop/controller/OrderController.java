@@ -23,11 +23,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến quản lý đơn hàng của người dùng.
 public class OrderController {
 
 	private final OrderService orderService;
 
-	/** Đặt hàng từ giỏ */
+	// Xử lý yêu cầu POST để đặt hàng từ giỏ hàng.
 	@PostMapping
 	public ResponseEntity<?> checkout(
 			@org.springframework.security.core.annotation.AuthenticationPrincipal CustomUserDetails cud,
@@ -36,7 +37,7 @@ public class OrderController {
 		return ResponseEntity.ok(Map.of("orderId", order.getId(), "status", order.getStatus()));
 	}
 
-	/** Lấy danh sách đơn hàng của user hiện tại */
+	// Xử lý yêu cầu GET để lấy danh sách đơn hàng của người dùng hiện tại.
 	@GetMapping
 	public List<Order> myOrders(
 			@org.springframework.security.core.annotation.AuthenticationPrincipal CustomUserDetails cud) {

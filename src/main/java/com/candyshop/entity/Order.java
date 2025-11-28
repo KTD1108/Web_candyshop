@@ -23,35 +23,38 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
-@Getter @Setter
+@Getter
+@Setter
 public class Order {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne @JoinColumn(name = "user_id")
-    private User user;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
-    private List<OrderItem> orderItems = new ArrayList<>();
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonManagedReference
+	private List<OrderItem> orderItems = new ArrayList<>();
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalAmount;
+	@Column(nullable = false, precision = 12, scale = 2)
+	private BigDecimal totalAmount;
 
-    private String status; // PENDING/PAID/CANCELLED
-    private String shippingAddress;
-    private String shippingPhone;
-    private String paymentMethod;
-    private String shippingMethod;
+	private String status;
+	private String shippingAddress;
+	private String shippingPhone;
+	private String paymentMethod;
+	private String shippingMethod;
 
-    @Column(columnDefinition = "TEXT")
-    private String orderNotes;
+	@Column(columnDefinition = "TEXT")
+	private String orderNotes;
 
-    private String voucherCode;
-    private BigDecimal discountAmount = BigDecimal.ZERO;
+	private String voucherCode;
+	private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal shippingFee;
+	@Column(nullable = false, precision = 12, scale = 2)
+	private BigDecimal shippingFee;
 
-    private Instant createdAt = Instant.now();
+	private Instant createdAt = Instant.now();
 }

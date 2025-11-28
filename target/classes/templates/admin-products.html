@@ -137,7 +137,7 @@
     }, 3000);
   }
 
-  // Check if user is logged in and is admin
+ 
   async function checkAdminStatus() {
     console.log('checkAdminStatus called');
     const token = localStorage.getItem('accessToken');
@@ -151,7 +151,7 @@
       const res = await fetch(`${API_BASE_URL}/auth/validate`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.status === 403) { // Forbidden
+      if (res.status === 403) { 
         console.log('checkAdminStatus: 403 Forbidden, redirecting to home.');
         showToast('Bạn không có quyền truy cập trang này.', 'error');
         setTimeout(() => { window.location.href = '/'; }, 1500);
@@ -185,7 +185,7 @@
     let isAdmin = false;
 
     if (token) {
-        isAdmin = await checkAdminStatus(); // Get isAdmin status
+        isAdmin = await checkAdminStatus(); 
         try {
             const res = await fetch('http://localhost:8080/api/cart', { headers: { 'Authorization': 'Bearer ' + token } });
             if (res.ok) {
@@ -231,7 +231,7 @@
     }
     navAuthContainer.innerHTML = authHtml;
 
-    // Attach event listener to the dynamically created logout button
+    
     const dynamicLogoutBtn = document.getElementById('logout-btn-dynamic');
     if (dynamicLogoutBtn) {
         dynamicLogoutBtn.addEventListener('click', () => {
@@ -273,7 +273,7 @@
         throw new Error('Failed to fetch categories');
       }
       const categories = await res.json();
-      productCategorySelect.innerHTML = ''; // Clear existing options
+      productCategorySelect.innerHTML = ''; 
       categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category.id;
@@ -289,7 +289,7 @@
   function displayProducts(products) {
     productsTableBody.innerHTML = '';
     products.forEach(product => {
-      console.log('Product ID:', product.id, 'Image URL:', product.thumbnailUrl); // Debug log
+      console.log('Product ID:', product.id, 'Image URL:', product.thumbnailUrl); 
       const row = productsTableBody.insertRow();
       row.innerHTML = `
         <td>${product.id}</td>
@@ -325,7 +325,7 @@
     productModalLabel.textContent = 'Thêm sản phẩm mới';
     productForm.reset();
     productIdInput.value = '';
-    fetchCategories(); // Load categories when adding a new product
+    fetchCategories(); 
   });
 
   saveProductBtn.addEventListener('click', async (e) => {
@@ -353,7 +353,7 @@
     try {
       let res;
       if (id) {
-        // Update product
+        
         res = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
           method: 'PUT',
           headers: {
@@ -363,7 +363,7 @@
           body: JSON.stringify(productData)
         });
       } else {
-        // Add new product
+        
         res = await fetch(`${API_BASE_URL}/admin/products`, {
           method: 'POST',
           headers: {
@@ -380,7 +380,7 @@
 
       showToast(`Sản phẩm đã được ${id ? 'cập nhật' : 'thêm'} thành công!`);
       productModal.hide();
-      fetchProducts(); // Refresh product list
+      fetchProducts(); 
     } catch (error) {
       console.error('Error saving product:', error);
       showToast('Lỗi khi lưu sản phẩm.', 'error');
@@ -408,7 +408,7 @@
       productImageUrlInput.value = product.thumbnailUrl;
       productStockQtyInput.value = product.stockQty;
 
-      await fetchCategories(); // Load categories before setting selected
+      await fetchCategories(); 
       if (product.category) {
         productCategorySelect.value = product.category.id;
       }
@@ -452,7 +452,7 @@
     const isAdmin = await checkAdminStatus();
     if (isAdmin) {
       fetchProducts();
-      fetchCategories(); // Fetch categories on initial load for the add form
+      fetchCategories(); 
     }
   });
 </script>

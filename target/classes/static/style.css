@@ -1,10 +1,9 @@
-/* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap');
 
-/* General Styles */
+
 body {
     font-family: 'Nunito Sans', sans-serif;
-    background-color: #FCFBF8; /* A very light, warm off-white */
+    background-color: #FCFBF8; 
     color: #333;
 }
 
@@ -20,7 +19,7 @@ body {
 .navbar-brand {
     font-weight: 700;
     font-size: 1.5rem;
-    color: #d58c8a !important; /* A soft pink/coral color */
+    color: #d58c8a !important; 
 }
 
 /* Buttons */
@@ -116,7 +115,7 @@ body {
     box-shadow: 0 4px 10px rgba(231, 60, 126, 0.4);
 }
 
-/* Product Card v2 */
+
 .product-card-v2 {
     background-color: #fff;
     border: none;
@@ -124,14 +123,14 @@ body {
     transition: box-shadow 0.3s ease, transform 0.3s ease;
     text-align: center;
     height: 100%;
-    position: relative; /* Add for badge positioning */
+    position: relative; 
 }
 
 .new-badge {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: #ffc107; /* A vibrant yellow */
+    background-color: #ffc107; 
     color: #333;
     padding: 5px 10px;
     font-size: 0.8rem;
@@ -176,10 +175,10 @@ body {
     font-size: 1.2rem;
     color: #d58c8a;
     font-weight: 700;
-    margin-bottom: 1rem; /* Add some space before the button */
+    margin-bottom: 1rem; 
 }
 
-/* Footer */
+
 .footer {
     background-color: #fff;
     padding: 50px 0;
@@ -199,7 +198,7 @@ body {
     color: #d58c8a;
 }
 
-/* Form controls */
+
 .form-control {
     border-radius: 10px;
 }
@@ -208,7 +207,7 @@ body {
     border: none;
 }
 
-/* Accordion (for orders) */
+
 .accordion-item {
     border-radius: 15px !important;
     border: 1px solid #eee;
@@ -224,7 +223,7 @@ body {
     box-shadow: none;
 }
 
-/* Toast Notification System */
+
 .toast-container {
     position: fixed;
     top: 20px;

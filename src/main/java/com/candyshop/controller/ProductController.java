@@ -17,24 +17,24 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến hiển thị và tìm kiếm sản phẩm.
 public class ProductController {
 
-    private final ProductService service;
+	private final ProductService service;
 
-    /** Danh sách sản phẩm (có tìm kiếm kw) */
-    @GetMapping
-    public Page<Product> list(@RequestParam(required = false) String kw,
-                              @RequestParam(required = false) Long categoryId,
-                              @RequestParam(defaultValue = "0") int page,
-                              @RequestParam(defaultValue = "12") int size,
-                              @RequestParam(required = false) String sort,
-                              @RequestParam(required = false) String direction) {
-        return service.search(kw, categoryId, page, size, sort, direction);
-    }
+	// Xử lý yêu cầu GET để lấy danh sách sản phẩm với các tùy chọn tìm kiếm, phân
+	// trang và sắp xếp.
+	@GetMapping
+	public Page<Product> list(@RequestParam(required = false) String kw,
+			@RequestParam(required = false) Long categoryId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "12") int size, @RequestParam(required = false) String sort,
+			@RequestParam(required = false) String direction) {
+		return service.search(kw, categoryId, page, size, sort, direction);
+	}
 
-    /** Chi tiết sản phẩm */
-    @GetMapping("/{id}")
-    public Product detail(@PathVariable Long id){
-        return service.getProductById(id);
-    }
+	// Xử lý yêu cầu GET để lấy thông tin chi tiết của một sản phẩm dựa trên ID.
+	@GetMapping("/{id}")
+	public Product detail(@PathVariable Long id) {
+		return service.getProductById(id);
+	}
 }

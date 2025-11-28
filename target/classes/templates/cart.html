@@ -228,8 +228,7 @@ async function updateNavbar() {
     
     let authHtml = '';
     if (token) {
-        // Simplified logic as admin status may not be available on all pages
-        // or require another API call. For simplicity, assuming non-admin path.
+        
         authHtml = `
             <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
                 Giỏ hàng <span class="badge bg-danger ms-1">${cartItemCount}</span>

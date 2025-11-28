@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+// Lớp này chịu trách nhiệm tải dữ liệu khởi tạo vào cơ sở dữ liệu khi ứng dụng bắt đầu chạy.
 public class DataLoader implements CommandLineRunner {
 
 	private final RoleRepository roleRepo;
@@ -34,10 +35,12 @@ public class DataLoader implements CommandLineRunner {
 	private final OrderItemRepository orderItemRepo;
 	private final OrderRepository orderRepo;
 
+	// Phương thức này được thực thi tự động khi ứng dụng Spring Boot khởi động.
 	@Override
 	@Transactional
 	public void run(String... args) throws Exception {
 
+		// Đảm bảo các vai trò (ROLE_USER, ROLE_ADMIN) tồn tại trong cơ sở dữ liệu.
 		roleRepo.findByName("ROLE_USER").orElseGet(() -> {
 			Role r = new Role();
 			r.setName("ROLE_USER");
@@ -49,6 +52,7 @@ public class DataLoader implements CommandLineRunner {
 			return roleRepo.save(r);
 		});
 
+		// Tạo người dùng admin mặc định nếu chưa tồn tại.
 		userRepo.findByEmail("admin@gmail.com").orElseGet(() -> {
 			User admin = new User();
 			admin.setEmail("admin@gmail.com");

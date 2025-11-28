@@ -67,7 +67,7 @@ const statusMap = {
 const statusBadgeMap = {
     "PENDING": "bg-warning",
     "PROCESSING": "bg-info",
-    "SHIPPED": "bg-primary", // Changed from bg-success to bg-primary for distinction
+    "SHIPPED": "bg-primary", 
     "DELIVERED": "bg-success",
     "CANCELLED": "bg-danger"
 };
@@ -181,8 +181,7 @@ async function updateNavbar() {
     
     let authHtml = '';
     if (token) {
-        // Simplified check as admin status may not be available on all pages
-        // or require another API call. For simplicity, assuming non-admin path.
+        
         authHtml = `
             <a class="btn btn-outline-primary btn-sm me-2" href="/cart.html">
                 Giỏ hàng <span class="badge bg-danger ms-1">${cartItemCount}</span>

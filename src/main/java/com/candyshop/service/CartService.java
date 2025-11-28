@@ -16,74 +16,86 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+// xử lý logic nghiệp vụ liên quan đến giỏ hàng của người dùng.
 public class CartService {
-    private final CartRepository cartRepo;
-    private final CartItemRepository cartItemRepo;
-    private final ProductRepository productRepo;
+	private final CartRepository cartRepo;
+	private final CartItemRepository cartItemRepo;
+	private final ProductRepository productRepo;
 
-    public Cart ensureCart(User user){
-        return cartRepo.findByUser(user).orElseGet(() -> {
-            Cart c = new Cart();
-            c.setUser(user);
-            return cartRepo.save(c);
-        });
-    }
+	// Đảm bảo rằng một người dùng có một giỏ hàng. Nếu chưa có, tạo mới.
+	public Cart ensureCart(User user) {
+		return cartRepo.findByUser(user).orElseGet(() -> {
+			Cart c = new Cart();
+			c.setUser(user);
+			return cartRepo.save(c);
+		});
+	}
 
-    @Transactional
-    public void addItem(User user, AddCartItemRequest req){
-        Cart cart = ensureCart(user);
-        Product p = productRepo.findById(req.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));
-        
-        // Optimized item lookup
-        CartItem item = cartItemRepo.findByCartAndProduct(cart, p).orElse(null);
-        
-        if(item == null){
-            item = new CartItem();
-            item.setCart(cart);
-            item.setProduct(p);
-            item.setQuantity(Math.max(1, req.getQuantity()==null?1:req.getQuantity()));
-        } else {
-            item.setQuantity(item.getQuantity() + Math.max(1, req.getQuantity()==null?1:req.getQuantity()));
-        }
-        cartItemRepo.save(item);
-    }
+	// Thêm một sản phẩm vào giỏ hàng hoặc tăng số lượng nếu đã tồn tại.
+	@Transactional
+	public void addItem(User user, AddCartItemRequest req) {
+		Cart cart = ensureCart(user);
+		Product p = productRepo.findById(req.getProductId())
+				.orElseThrow(() -> new RuntimeException("Product not found"));
 
-    @Transactional
-    public void deleteItem(Long cartItemId, User user) {
-        Cart cart = ensureCart(user);
-        CartItem item = cartItemRepo.findById(cartItemId).orElseThrow(() -> new RuntimeException("CartItem not found"));
+		// Tìm kiếm sản phẩm trong giỏ hàng.
+		CartItem item = cartItemRepo.findByCartAndProduct(cart, p).orElse(null);
 
-        // Ensure the item belongs to the user's cart before deleting
-        if (!item.getCart().getId().equals(cart.getId())) {
-            throw new SecurityException("Access denied to delete this cart item");
-        }
+		// Nếu sản phẩm chưa có trong giỏ hàng, tạo mới.
+		if (item == null) {
+			item = new CartItem();
+			item.setCart(cart);
+			item.setProduct(p);
+			item.setQuantity(Math.max(1, req.getQuantity() == null ? 1 : req.getQuantity()));
+		} else {
+			// Nếu đã có, tăng số lượng.
+			item.setQuantity(item.getQuantity() + Math.max(1, req.getQuantity() == null ? 1 : req.getQuantity()));
+		}
+		cartItemRepo.save(item);
+	}
 
-        cartItemRepo.delete(item);
-    }
+	// Xóa một mục khỏi giỏ hàng.
+	@Transactional
+	public void deleteItem(Long cartItemId, User user) {
+		Cart cart = ensureCart(user);
+		CartItem item = cartItemRepo.findById(cartItemId).orElseThrow(() -> new RuntimeException("CartItem not found"));
 
-    @Transactional
-    public CartItem updateCartItemQuantity(Long cartItemId, int quantity, User user) {
-        Cart cart = ensureCart(user);
-        CartItem cartItem = cartItemRepo.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không tìm thấy trong giỏ hàng"));
+		// Đảm bảo rằng mục này thuộc về giỏ hàng của người dùng trước khi xóa.
+		if (!item.getCart().getId().equals(cart.getId())) {
+			throw new SecurityException("Access denied to delete this cart item");
+		}
 
-        if (!cartItem.getCart().getId().equals(cart.getId())) {
-            throw new SecurityException("Bạn không có quyền thay đổi mục này");
-        }
+		cartItemRepo.delete(item);
+	}
 
-        Product product = cartItem.getProduct();
-        if (quantity > product.getStockQty()) {
-            throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
-        }
+	// Cập nhật số lượng của một mục trong giỏ hàng.
+	@Transactional
+	public CartItem updateCartItemQuantity(Long cartItemId, int quantity, User user) {
+		Cart cart = ensureCart(user);
+		CartItem cartItem = cartItemRepo.findById(cartItemId)
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tìm thấy trong giỏ hàng"));
 
-        if (quantity <= 0) {
-            // Because of orphanRemoval=true on the Cart's cartItems list,
-            // simply removing the item from the parent's collection is enough to delete it.
-            cart.getCartItems().remove(cartItem);
-            return null; // Return null to indicate deletion
-        } else {
-            cartItem.setQuantity(quantity);
-            return cartItemRepo.save(cartItem);
-        }
-    }
+		// Đảm bảo rằng mục này thuộc về giỏ hàng của người dùng.
+		if (!cartItem.getCart().getId().equals(cart.getId())) {
+			throw new SecurityException("Bạn không có quyền thay đổi mục này");
+		}
+
+		Product product = cartItem.getProduct();
+		// Kiểm tra xem số lượng yêu cầu có vượt quá số lượng tồn kho không.
+		if (quantity > product.getStockQty()) {
+			throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
+		}
+
+		// Nếu số lượng nhỏ hơn hoặc bằng 0, xóa mục khỏi giỏ hàng.
+		if (quantity <= 0) {
+			// Do có `orphanRemoval=true` trong danh sách `cartItems` của `Cart`,
+			// việc xóa khỏi collection của đối tượng cha là đủ để xóa khỏi DB.
+			cart.getCartItems().remove(cartItem);
+			return null; // Trả về null để báo hiệu đã xóa
+		} else {
+			// Nếu không, cập nhật số lượng.
+			cartItem.setQuantity(quantity);
+			return cartItemRepo.save(cartItem);
+		}
+	}
 }

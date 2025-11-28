@@ -1,7 +1,6 @@
 package com.candyshop.controller.admin;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,39 +27,45 @@ public class AdminVoucherController {
 
 	private final VoucherService voucherService;
 
+	// Xử lý yêu cầu GET để lấy tất cả các mã giảm giá.
 	@GetMapping
 	public ResponseEntity<List<Voucher>> getAllVouchers() {
 		return ResponseEntity.ok(voucherService.findAll());
 	}
 
+	// Xử lý yêu cầu GET để lấy thông tin một mã giảm giá cụ thể dựa trên ID.
 	@GetMapping("/{id}")
 	public ResponseEntity<Voucher> getVoucherById(@PathVariable Long id) {
 		return voucherService.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
+	// Xử lý yêu cầu POST để tạo một mã giảm giá mới.
 	@PostMapping
 	public ResponseEntity<Voucher> createVoucher(@RequestBody Voucher voucher) {
-		// Ensure ID is null for creation
+		// Đảm bảo ID là null khi tạo mới để Spring JPA tự động quản lý.
 		voucher.setId(null);
 		Voucher createdVoucher = voucherService.save(voucher);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdVoucher);
 	}
 
+	// Xử lý yêu cầu PUT để cập nhật thông tin mã giảm giá hiện có dựa trên ID.
 	@PutMapping("/{id}")
 	public ResponseEntity<Voucher> updateVoucher(@PathVariable Long id, @RequestBody Voucher voucher) {
 		return voucherService.findById(id).map(existingVoucher -> {
 			existingVoucher.setCode(voucher.getCode());
-			existingVoucher.setDiscountType(voucher.getDiscountType()); // Added this line
+			existingVoucher.setDiscountType(voucher.getDiscountType());
 			existingVoucher.setDiscountValue(voucher.getDiscountValue());
 			existingVoucher.setMinOrderAmount(voucher.getMinOrderAmount());
 			existingVoucher.setUsageLimit(voucher.getUsageLimit());
 			existingVoucher.setValidTo(voucher.getValidTo());
 			existingVoucher.setActive(voucher.isActive());
-			// existingVoucher.setCurrentUsage(voucher.getCurrentUsage()); // Used count should not be updated directly by admin
+			// existingVoucher.setCurrentUsage(voucher.getCurrentUsage()); // Số lượng đã sử
+			// dụng không nên được admin cập nhật trực tiếp
 			return ResponseEntity.ok(voucherService.save(existingVoucher));
 		}).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
+	// Xử lý yêu cầu DELETE để xóa một mã giảm giá dựa trên ID.
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteVoucher(@PathVariable Long id) {
 		if (voucherService.findById(id).isPresent()) {

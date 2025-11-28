@@ -23,10 +23,12 @@ import java.util.List;
 @RequestMapping("/api/vouchers")
 @RequiredArgsConstructor
 @CrossOrigin
+// Lớp Controller xử lý các yêu cầu liên quan đến xác thực và truy xuất mã giảm giá cho người dùng.
 public class VoucherController {
 
     private final VoucherService voucherService;
 
+    // Xử lý yêu cầu POST để xác thực mã giảm giá và tính toán số tiền giảm giá.
     @PostMapping("/validate")
     public ResponseEntity<ValidateVoucherResponse> validateVoucher(@RequestBody ValidateVoucherRequest request) {
         try {
@@ -54,6 +56,7 @@ public class VoucherController {
         }
     }
 
+    // Xử lý yêu cầu GET để lấy danh sách các mã giảm giá có sẵn dựa trên tổng giá trị đơn hàng.
     @GetMapping("/available")
     public ResponseEntity<List<Voucher>> getAvailableVouchers(@RequestParam String subtotal) {
         BigDecimal subtotalDecimal = new BigDecimal(subtotal);
