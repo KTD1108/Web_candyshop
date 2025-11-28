@@ -5,7 +5,7 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: validate        # OK nếu migration tạo đủ bảng
+      ddl-auto: validate        
     properties:
       hibernate:
         format_sql: true
@@ -13,7 +13,7 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    # baseline-on-migrate: true   # Chỉ bật nếu DB đã có sẵn bảng
+    # baseline-on-migrate: true   
 
 server:
   port: 8080

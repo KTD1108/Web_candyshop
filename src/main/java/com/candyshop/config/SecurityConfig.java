@@ -41,9 +41,8 @@ public class SecurityConfig {
 			throws Exception {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				            .authorizeHttpRequests(authorize -> authorize
-				                .requestMatchers("/**").permitAll() // Tạm thời cho phép tất cả các request để debug
-				            ).authenticationProvider(authenticationProvider)
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
@@ -71,7 +70,6 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration c = new CorsConfiguration();
-		// Nếu bạn dùng cookie/credentials, KHÔNG được dùng "*"; hãy chỉ rõ origin.
 		c.setAllowedOrigins(List.of("*"));
 		c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		c.setAllowedHeaders(List.of("*"));

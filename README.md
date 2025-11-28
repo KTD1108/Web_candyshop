@@ -1,6 +1,6 @@
-# Tiệm Ngọt 108 - Dự án Web Fullstack (Spring Boot + Thymeleaf)
+# Tiệm Ngọt 108 - Dự án Web Fullstack (Spring Boot API + JavaScript Frontend)
 
-Dự án "Tiệm Ngọt 108" là một ứng dụng web fullstack được phát triển bằng Spring Boot. Ứng dụng này tích hợp cả logic nghiệp vụ backend và giao diện người dùng frontend thông qua việc sử dụng Thymeleaf để render các trang HTML động và phục vụ các tài nguyên tĩnh. Nó cung cấp một nền tảng thương mại điện tử hoàn chỉnh cho cửa hàng bánh kẹo trực tuyến, với các tính năng quản lý sản phẩm, đơn hàng, người dùng và bảo mật JWT.
+Dự án "Tiệm Ngọt 108" là một ứng dụng web fullstack được phát triển bằng Spring Boot. Ứng dụng này bao gồm một Backend cung cấp API RESTful và một Frontend được xây dựng chủ yếu với JavaScript, Bootstrap và các trang HTML tĩnh được phục vụ bởi Thymeleaf. Frontend sẽ gọi các API này để tải dữ liệu động và hiển thị lên giao diện. Nó cung cấp một nền tảng thương mại điện tử hoàn chỉnh cho cửa hàng bánh kẹo trực tuyến, với các tính năng quản lý sản phẩm, đơn hàng, người dùng và bảo mật JWT.
 
 ## Mục lục
 
@@ -55,8 +55,7 @@ Dự án này được xây dựng trên nền tảng Spring Boot và sử dụn
     -   **Spring Security:** Cung cấp các tính năng bảo mật mạnh mẽ, bao gồm xác thực và phân quyền dựa trên JWT.
     -   **Spring Data JPA:** Đơn giản hóa việc tương tác với cơ sở dữ liệu thông qua các Repository và Hibernate.
     -   **Spring Validation:** Hỗ trợ xác thực dữ liệu đầu vào.
-    -   **Thymeleaf:** Công cụ tạo mẫu phía máy chủ, được sử dụng để phục vụ các tệp HTML (templates) cho trình duyệt. Tuy nhiên, phần lớn nội dung động trên các trang được xử lý bởi JavaScript phía client sau khi trang được tải.
--   **Bootstrap:** Phiên bản 5.3.3, framework CSS phổ biến để xây dựng giao diện người dùng đáp ứng và hiện đại.
+            -   **Thymeleaf:** Công cụ tạo mẫu phía máy chủ, được sử dụng trong dự án này để phục vụ các tệp HTML tĩnh (templates) cho trình duyệt. Toàn bộ nội dung động trên các trang được xử lý bởi JavaScript phía client sau khi trang được tải, thông qua việc gọi các API REST của backend.-   **Bootstrap:** Phiên bản 5.3.3, framework CSS phổ biến để xây dựng giao diện người dùng đáp ứng và hiện đại.
 -   **Vanilla JavaScript:** Được sử dụng để xử lý tương tác phía client, tải dữ liệu động thông qua API và quản lý các sự kiện DOM.
 -   **Google Fonts:** Cung cấp phông chữ 'Nunito Sans' cho thiết kế giao diện.
 -   **Maven:** Công cụ quản lý dự án và xây dựng tự động.

@@ -35,9 +35,9 @@ public class DataLoader implements CommandLineRunner {
 	private final OrderRepository orderRepo;
 
 	@Override
-	@Transactional // <== thêm để đảm bảo thứ tự xóa/ghi trong 1 transaction
+	@Transactional
 	public void run(String... args) throws Exception {
-		// Ensure roles
+
 		roleRepo.findByName("ROLE_USER").orElseGet(() -> {
 			Role r = new Role();
 			r.setName("ROLE_USER");
@@ -49,7 +49,6 @@ public class DataLoader implements CommandLineRunner {
 			return roleRepo.save(r);
 		});
 
-		// Create default admin if not exists
 		userRepo.findByEmail("admin@gmail.com").orElseGet(() -> {
 			User admin = new User();
 			admin.setEmail("admin@gmail.com");
@@ -62,21 +61,6 @@ public class DataLoader implements CommandLineRunner {
 			return userRepo.save(admin);
 		});
 
-		// --- DATA IS NOW PERSISTENT ---
-		// The following code to reset and seed data has been removed as per user
-		// request.
-		// The application will now use the data that exists in the database.
-
-		// orderItemRepo.deleteAllInBatch();
-		// orderRepo.deleteAllInBatch();
-		// cartItemRepo.deleteAllInBatch();
-		// cartRepo.deleteAllInBatch();
-		// prodRepo.deleteAllInBatch();
-		// catRepo.deleteAllInBatch();
-
-		// Seeding logic for categories and products has also been removed.
 	}
-
-	// The createProduct method is no longer needed.
 
 }

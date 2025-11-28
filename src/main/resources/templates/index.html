@@ -134,16 +134,15 @@ async function loadProducts(page=0){
   const featuredGrid = document.getElementById('featured-grid');
   const mainGrid = document.getElementById('grid');
   
-  // Clear grids before rendering
-  if (page === 0) { // Only clear featured grid on first page load
+ 
+  if (page === 0) { 
     featuredGrid.innerHTML = '';
   }
   mainGrid.innerHTML = '';
 
   const products = data.content;
-  const isAdmin = await checkAdminStatus(); // Fetch isAdmin status
+  const isAdmin = await checkAdminStatus(); 
 
-  // Render featured products only when no filter is active
   if (page === 0 && !currentCategoryId && !kw) {
       products.slice(0, 8).forEach((p, index) => {
         featuredGrid.innerHTML += renderProductCard(p, index < 4, isAdmin);
@@ -153,7 +152,6 @@ async function loadProducts(page=0){
       document.getElementById('featured-products').style.display = 'none';
   }
 
-  // Render all products for the current view
   products.forEach(p=>{
     mainGrid.innerHTML += renderProductCard(p, false, isAdmin);
   });
